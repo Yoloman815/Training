@@ -83,7 +83,10 @@ svg.i{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke
 .nav-btn.strong{font-weight:600}
 .nav-btn.end{justify-self:end}
 .nav-btn svg{width:22px;height:22px}
-.navbar{margin-bottom:calc(-44px - env(safe-area-inset-top))}
+.navbar{margin-bottom:calc(-44px - env(safe-area-inset-top));pointer-events:none}
+.navbar.scrolled,.navbar .nav-btn{pointer-events:auto}
+.navbar.has-left{margin-bottom:0}
+.navbar.has-left + .lt{padding-top:0}
 .lt{padding:calc(env(safe-area-inset-top) + 10px) 16px 6px}
 .lt-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
 .lt h1{margin:0;font-size:34px;line-height:41px;font-weight:700;letter-spacing:.2px;overflow-wrap:anywhere}
@@ -1060,7 +1063,7 @@ Antworte nur mit JSON: {"topics":[{"title":"...","goal":"...","keywords":["..."]
 }
 
 /* ================= Ansichten ================= */
-function navbar(title, left, right) { return `<div class="navbar" id="navbar">${left || '<span></span>'}<span class="nav-title">${esc(title)}</span><span style="justify-self:end">${right || ''}</span></div>`; }
+function navbar(title, left, right) { return `<div class="navbar${left ? ' has-left' : ''}" id="navbar">${left || '<span></span>'}<span class="nav-title">${esc(title)}</span><span style="justify-self:end">${right || ''}</span></div>`; }
 function viewToday() {
   const p = state.profile, due = dueCards().length, st = streak(), acc = accuracy();
   let cont = null;
