@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lernen</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Lernen">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  /* Layout: iPhone-App in einer Spalte (max. 500 px) – große Titel, gruppierte Listen, Tab-Leiste unten; Lernsession als Vollbild mit Stufenleiste */
+  --bg:#F2F2F7;
+  --card:#FFFFFF;
+  --fill:rgba(118,118,128,.12);
+  --fill-2:rgba(118,118,128,.22);
+  --label:#000000;
+  --label-2:rgba(60,60,67,.6);
+  --label-3:rgba(60,60,67,.3);
+  --sep:rgba(60,60,67,.29);
+  --tint:#5856D6;
+  --tint-soft:rgba(88,86,214,.12);
+  --green:#34C759; --green-soft:rgba(52,199,89,.15);
+  --orange:#FF9500; --orange-soft:rgba(255,149,0,.15);
+  --red:#FF3B30; --red-soft:rgba(255,59,48,.12);
+  --bar:rgba(249,249,249,.86);
+  --seg-on:#FFFFFF;
+  --seg-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04);
+  --scrim:rgba(0,0,0,.35);
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",system-ui,"Segoe UI",Roboto,Arial,sans-serif;
+  --font-round:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,Arial,sans-serif;
+  --tabbar-h:calc(56px + env(safe-area-inset-bottom));
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#000000; --card:#1C1C1E; --fill:rgba(118,118,128,.24); --fill-2:rgba(118,118,128,.36);
+    --label:#FFFFFF; --label-2:rgba(235,235,245,.6); --label-3:rgba(235,235,245,.3); --sep:rgba(84,84,88,.65);
+    --tint:#7D7AFF; --tint-soft:rgba(125,122,255,.2);
+    --green:#30D158; --green-soft:rgba(48,209,88,.18); --orange:#FF9F0A; --orange-soft:rgba(255,159,10,.18); --red:#FF453A; --red-soft:rgba(255,69,58,.18);
+    --bar:rgba(22,22,24,.86); --seg-on:#636366; --seg-shadow:none; --scrim:rgba(0,0,0,.6);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#000000; --card:#1C1C1E; --fill:rgba(118,118,128,.24); --fill-2:rgba(118,118,128,.36);
+  --label:#FFFFFF; --label-2:rgba(235,235,245,.6); --label-3:rgba(235,235,245,.3); --sep:rgba(84,84,88,.65);
+  --tint:#7D7AFF; --tint-soft:rgba(125,122,255,.2);
+  --green:#30D158; --green-soft:rgba(48,209,88,.18); --orange:#FF9F0A; --orange-soft:rgba(255,159,10,.18); --red:#FF453A; --red-soft:rgba(255,69,58,.18);
+  --bar:rgba(22,22,24,.86); --seg-on:#636366; --seg-shadow:none; --scrim:rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{height:100%;margin:0;overflow:hidden}
+body{background:var(--bg);color:var(--label);font-family:var(--font);font-size:17px;line-height:1.35;letter-spacing:-.2px;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+button,input,textarea{font:inherit;color:inherit;letter-spacing:inherit}
+button{cursor:pointer}
+p{margin:0}
+:focus-visible{outline:2px solid var(--tint);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.center{text-align:center}
+.app{position:fixed;top:0;right:0;bottom:0;left:0;max-width:500px;margin:0 auto;background:var(--bg);overflow:hidden}
+@media (min-width:520px){.app{border-left:.5px solid var(--sep);border-right:.5px solid var(--sep)}}
+main{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:calc(var(--tabbar-h) + 20px)}
+.tabbar{position:absolute;left:0;right:0;bottom:0;z-index:20;height:var(--tabbar-h);display:grid;grid-template-columns:repeat(3,1fr);padding:7px 4px env(safe-area-inset-bottom);background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid var(--sep)}
+.tab{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:0;color:var(--label-2);font-size:10px;font-weight:500;letter-spacing:.1px;position:relative}
+.tab svg{width:27px;height:27px}
+.tab[aria-current="page"]{color:var(--tint)}
+.tab .tbadge{position:absolute;top:-2px;left:calc(50% + 7px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:12px;font-weight:600;line-height:18px;text-align:center}
+svg.i{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.navbar{position:sticky;top:0;z-index:10;height:44px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 16px;border-bottom:.5px solid transparent;transition:background-color .2s,border-color .2s}
+.navbar .nav-title{font-size:17px;font-weight:600;opacity:0;transition:opacity .2s;max-width:56vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.navbar.scrolled{background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom-color:var(--sep)}
+.navbar.scrolled .nav-title{opacity:1}
+.nav-btn{border:0;background:none;color:var(--tint);font-size:17px;padding:10px 0;justify-self:start;display:inline-flex;align-items:center;gap:2px}
+.nav-btn.strong{font-weight:600}
+.nav-btn.end{justify-self:end}
+.nav-btn svg{width:22px;height:22px}
+.lt{padding:0 16px 6px}
+.lt-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.lt h1{margin:0;font-size:34px;line-height:41px;font-weight:700;letter-spacing:.2px;overflow-wrap:anywhere}
+.lt-date{font-size:13px;font-weight:600;text-transform:uppercase;color:var(--label-2);margin-bottom:-2px}
+.lt-sub{margin-top:2px;font-size:15px;color:var(--label-2)}
+.avatar-btn{flex:none;width:36px;height:36px;border-radius:50%;border:0;background:linear-gradient(180deg,#A5A5AE,#7D7D86);color:#fff;font-weight:600;font-size:15px;margin-bottom:4px;display:grid;place-items:center}
+.content{padding:8px 16px 16px;display:flex;flex-direction:column;gap:12px}
+.sec-title{margin:12px 4px -4px;font-size:22px;line-height:28px;font-weight:700;letter-spacing:.35px}
+.card{background:var(--card);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.group{background:var(--card);border-radius:12px;overflow:hidden}
+.group > *{position:relative}
+.group > * + *::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--sep);pointer-events:none}
+.row{display:flex;align-items:center;gap:12px;min-height:44px;padding:10px 16px;width:100%;border:0;background:none;text-align:left;font:inherit;color:inherit;letter-spacing:inherit}
+button.row:active{background:var(--fill)}
+.row-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.row-title{font-size:17px;overflow-wrap:anywhere}
+.row-sub{font-size:15px;color:var(--label-2)}
+.row-val{font-size:17px;color:var(--label-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chev{flex:none;width:8px;height:14px;color:var(--label-3)}
+.row.add{color:var(--tint);gap:8px}
+.row.add svg{width:20px;height:20px;flex:none}
+.row.destructive{color:var(--red);justify-content:center}
+.row.tint{color:var(--tint);justify-content:center}
+.num-dot{flex:none;width:28px;height:28px;border-radius:50%;background:var(--fill);display:grid;place-items:center;font-family:var(--font-round);font-weight:600;font-size:14px;color:var(--label-2)}
+.num-dot.ok{background:var(--green);color:#fff}
+.num-dot.warn{background:var(--orange);color:#fff}
+.num-dot.go{background:var(--tint);color:#fff}
+.num-dot svg{width:15px;height:15px;stroke-width:3}
+.cap{font-size:13px;font-weight:600;text-transform:uppercase;color:var(--label-2)}
+.cap.pad{padding:18px 16px 7px}
+.title2{font-size:22px;line-height:28px;font-weight:700;letter-spacing:.35px;margin:0}
+.title3{font-size:20px;line-height:25px;font-weight:600;letter-spacing:.38px;margin:0}
+.headline{font-size:17px;font-weight:600}
+.sub{font-size:15px;color:var(--label-2);line-height:1.38}
+.foot{font-size:13px;color:var(--label-2);padding:7px 16px 0;line-height:1.4}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:14px;min-height:50px;padding:0 18px;font-family:var(--font);font-size:17px;font-weight:600;width:100%;text-align:center}
+.btn.filled{background:var(--tint);color:#fff}
+.btn.tinted{background:var(--tint-soft);color:var(--tint)}
+.btn.green{background:var(--green);color:#fff}
+.btn.plain{background:var(--fill);color:var(--label)}
+.btn.small{min-height:38px;border-radius:10px;font-size:15px;width:auto;align-self:flex-start;padding:0 16px}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn:active:not(:disabled){opacity:.7}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.link{border:0;background:none;color:var(--tint);font-size:15px;font-weight:500;padding:2px 0;align-self:flex-start}
+.badge{display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:2px 8px;background:var(--fill);color:var(--label-2);white-space:nowrap;letter-spacing:0}
+.badge.green{background:var(--green-soft);color:var(--green)}
+.badge.orange{background:var(--orange-soft);color:var(--orange)}
+.badge.tint{background:var(--tint-soft);color:var(--tint)}
+.warn-card{background:var(--orange-soft)}
+.warn-card .headline{color:var(--orange)}
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--card);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.stat-num{font-family:var(--font-round);font-weight:700;font-size:26px;line-height:1.05;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stat-lbl{font-size:13px;color:var(--label-2);line-height:1.25}
+.bar{height:6px;border-radius:3px;background:var(--fill);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--tint);border-radius:3px}
+.empty{align-items:center;text-align:center;padding:28px 20px;gap:10px}
+.empty svg{width:52px;height:52px;color:var(--label-3)}
+
+/* Text der KI */
+.md{font-size:17px;line-height:1.5}
+.md p{margin:0 0 10px}
+.md p:last-child{margin-bottom:0}
+.md ul,.md ol{margin:0 0 10px;padding-left:22px}
+.md li{margin:3px 0}
+.md h4{font-size:17px;font-weight:600;margin:12px 0 6px}
+.md strong{font-weight:600}
+.md code{font-family:ui-monospace,Menlo,monospace;font-size:15px;background:var(--fill);padding:1px 5px;border-radius:5px}
+
+/* Lernsession */
+.overlay{position:absolute;inset:0;z-index:40;background:var(--bg);display:flex;flex-direction:column;animation:slideup .32s cubic-bezier(.2,.8,.2,1)}
+.wo-nav{flex:none;height:52px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 16px;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--sep)}
+.wo-nav .nav-title{font-size:17px;font-weight:600;max-width:46vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.wo-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:12px 16px 28px;display:flex;flex-direction:column;gap:12px}
+.wo-foot{flex:none;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid var(--sep);display:flex;flex-direction:column;gap:8px}
+.foot-note{font-size:14px;color:var(--label-2);text-align:center}
+.stagebar{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px 16px 8px;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--sep)}
+.stg{display:flex;flex-direction:column;gap:5px}
+.stg i{height:5px;border-radius:3px;background:var(--fill-2)}
+.stg span{font-size:11px;font-weight:600;color:var(--label-2);text-align:center;white-space:nowrap}
+.stg.done i{background:var(--green)}
+.stg.now i{background:var(--tint)}
+.stg.now span{color:var(--tint)}
+.q{gap:10px}
+.q-num{font-size:13px;font-weight:600;text-transform:uppercase;color:var(--label-2)}
+.q-text{font-size:17px;font-weight:600;line-height:1.4}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;align-items:flex-start;gap:12px;text-align:left;border:1.5px solid var(--fill-2);background:none;border-radius:12px;padding:11px 12px;font-size:16px;line-height:1.35;width:100%}
+.opt:active:not(:disabled){background:var(--fill)}
+.opt-mark{flex:none;width:24px;height:24px;border-radius:50%;background:var(--fill);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--label-2)}
+.opt.right{border-color:var(--green);background:var(--green-soft)}
+.opt.right .opt-mark{background:var(--green);color:#fff}
+.opt.wrong{border-color:var(--red);background:var(--red-soft)}
+.opt.wrong .opt-mark{background:var(--red);color:#fff}
+.opt.dim{opacity:.55}
+.opt:disabled{cursor:default;color:var(--label)}
+.fb{border-radius:12px;padding:11px 13px;font-size:15px;line-height:1.45}
+.fb.ok{background:var(--green-soft)}
+.fb.ok strong{color:var(--green)}
+.fb.mid{background:var(--orange-soft)}
+.fb.mid strong{color:var(--orange)}
+.fb.no{background:var(--red-soft)}
+.fb.no strong{color:var(--red)}
+.fb.wait{background:var(--fill);color:var(--label-2);display:flex;align-items:center;gap:8px}
+.fb details{margin-top:8px}
+.fb summary{color:var(--tint);font-weight:600;cursor:pointer}
+.fb .md{font-size:15px;margin-top:6px}
+.fb ul{margin:6px 0 0;padding-left:20px}
+.hint{background:var(--orange-soft);border-radius:12px;padding:10px 12px;font-size:15px}
+textarea.ans{width:100%;min-height:96px;border:1.5px solid var(--fill-2);background:var(--card);border-radius:12px;padding:11px 12px;font-size:17px;line-height:1.4;resize:vertical;outline:none}
+textarea.ans:focus{border-color:var(--tint)}
+textarea.ans[readonly]{background:var(--fill);border-color:transparent}
+.skel{display:flex;flex-direction:column;gap:10px;padding:4px 0}
+.skel span{height:14px;border-radius:7px;background:linear-gradient(90deg,var(--fill),var(--fill-2),var(--fill));background-size:200% 100%;animation:shimmer 1.2s linear infinite}
+.skel span:nth-child(2){width:86%}
+.skel span:nth-child(3){width:70%}
+.skel span:nth-child(4){width:92%}
+.skel span:nth-child(5){width:55%}
+@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+.typing{display:inline-flex;gap:4px;padding:3px 0}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--label-2);animation:blink 1.2s infinite both}
+.typing i:nth-child(2){animation-delay:.2s}
+.typing i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:.9}}
+.done-badge{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;align-self:center;color:#fff;background:var(--green);margin-top:6px}
+.done-badge.warn{background:var(--orange)}
+.done-badge svg{width:40px;height:40px;stroke-width:3}
+.done-badge span{font-family:var(--font-round);font-weight:700;font-size:24px}
+
+/* Karteikarten */
+.flash{flex:1;min-height:260px;background:var(--card);border-radius:20px;padding:22px 20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.flash .front{font-size:21px;font-weight:600;line-height:1.35}
+.flash hr{border:0;border-top:.5px solid var(--sep);margin:4px 0;width:100%}
+.flash .back{font-size:17px;line-height:1.5}
+.boxes{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;align-items:end;height:90px}
+.boxes div{display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.boxes b{width:100%;border-radius:6px 6px 2px 2px;background:var(--tint);min-height:3px}
+.boxes span{font-size:12px;color:var(--label-2)}
+
+/* Chat zur Frage */
+.msgs{display:flex;flex-direction:column;gap:6px}
+.msg{max-width:84%;display:flex;flex-direction:column}
+.msg.me{align-self:flex-end;align-items:flex-end}
+.bubble{padding:8px 13px;border-radius:19px;font-size:16px;line-height:1.38;overflow-wrap:anywhere}
+.msg.me .bubble{background:var(--tint);color:#fff}
+.msg.ai .bubble{background:var(--fill);color:var(--label)}
+.chat-form{display:flex;align-items:center;gap:8px;margin-top:10px}
+.chat-form input{flex:1;min-width:0;height:38px;border-radius:19px;border:1px solid var(--fill-2);background:var(--card);padding:0 14px;font-size:17px;outline:none}
+.chat-form input:focus{border-color:var(--tint)}
+.send{flex:none;width:34px;height:34px;border-radius:50%;border:0;background:var(--tint);color:#fff;display:grid;place-items:center;padding:0}
+.send svg{width:18px;height:18px;stroke-width:2.6}
+.send:disabled{background:var(--fill-2)}
+
+/* Sheets */
+.sheet-wrap{position:absolute;inset:0;z-index:60;background:var(--scrim);display:flex;align-items:flex-end;animation:fade .2s ease}
+.sheet{width:100%;max-height:calc(100% - 12px);display:flex;flex-direction:column;background:var(--bg);border-radius:12px 12px 0 0;overflow:hidden;animation:slideup .32s cubic-bezier(.2,.8,.2,1)}
+.sheet:focus{outline:none}
+.sheet.as{background:transparent;border-radius:0;padding:0 8px calc(8px + env(safe-area-inset-bottom));gap:8px;overflow:visible}
+.sheet-nav{flex:none;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;min-height:56px;padding:0 16px;background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--sep)}
+.sheet-nav .nav-title{font-size:17px;font-weight:600;text-align:center;max-width:52vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet-body{overflow-y:auto;overscroll-behavior:contain;padding:8px 16px calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column}
+.sheet-body > .card, .sheet-body > .seg{margin-top:4px}
+.frow{display:flex;align-items:center;gap:12px;min-height:44px;padding:4px 16px}
+.flabel{flex:none;font-size:17px}
+.spacer{flex:1}
+.finput{flex:1;min-width:0;border:0;background:transparent;font-family:var(--font);font-size:17px;color:var(--label);text-align:right;padding:9px 0;outline:none}
+.finput::placeholder,.fta::placeholder{color:var(--label-3)}
+.frow:focus-within{box-shadow:inset 3px 0 0 var(--tint)}
+.fta{display:block;width:100%;min-height:150px;border:0;background:transparent;font-family:var(--font);font-size:17px;line-height:1.4;color:var(--label);padding:12px 16px;resize:vertical;outline:none}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--fill);border-radius:9px;padding:2px;gap:2px}
+.seg button{border:0;background:none;border-radius:7px;padding:7px 2px;font-size:13px;font-weight:500;color:var(--label);white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--seg-on);box-shadow:var(--seg-shadow);font-weight:600}
+.as-group{background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-radius:14px;overflow:hidden}
+.as-group > *{position:relative}
+.as-group > * + *::before{content:"";position:absolute;top:0;left:0;right:0;border-top:.5px solid var(--sep)}
+.as-head{padding:14px 16px;text-align:center}
+.as-title{font-size:13px;font-weight:600;color:var(--label-2)}
+.as-text{font-size:13px;color:var(--label-2);margin-top:3px;line-height:1.35}
+.as-btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:57px;border:0;background:none;font-size:20px;color:var(--tint)}
+.as-btn.destructive{color:var(--red)}
+.as-btn.strong{font-weight:600}
+.progress-line{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--label-2)}
+.toast{position:absolute;left:50%;top:calc(16px + env(safe-area-inset-top));transform:translate(-50%,-8px);z-index:80;background:rgba(28,28,30,.92);color:#fff;padding:10px 16px;border-radius:999px;font-size:15px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;width:max-content;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@keyframes slideup{from{transform:translateY(40px);opacity:.5}to{transform:none;opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <main id="main"></main>
+  <nav class="tabbar" id="tabbar" aria-label="Bereiche">
+    <button type="button" class="tab" data-tab="today"><svg class="i" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 4.5a7 7 0 0 0-4.2 12.6c.8.6 1.2 1.4 1.2 2.3v.6h6v-.6c0-.9.4-1.7 1.2-2.3A7 7 0 0 0 14 4.5z"/><path d="M11.2 23.5h5.6"/></svg><span>Heute</span></button>
+    <button type="button" class="tab" data-tab="subjects"><svg class="i" viewBox="0 0 28 28" aria-hidden="true"><path d="M4 7.5c3.3-1.6 6.6-1.6 10 0v15c-3.4-1.6-6.7-1.6-10 0z"/><path d="M24 7.5c-3.3-1.6-6.6-1.6-10 0v15c3.4-1.6 6.7-1.6 10 0z"/></svg><span>Fächer</span></button>
+    <button type="button" class="tab" data-tab="cards"><svg class="i" viewBox="0 0 28 28" aria-hidden="true"><rect x="4" y="8" width="16" height="15" rx="3"/><path d="M8.5 5h13a2.5 2.5 0 0 1 2.5 2.5V19"/></svg><span>Karten</span><span class="tbadge" id="cardBadge" hidden></span></button>
+  </nav>
+  <div class="overlay" id="overlay" hidden></div>
+  <div class="sheet-wrap" id="sheetWrap" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true" tabindex="-1"></div></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ================= Helfer ================= */
+const $ = (s, el) => (el || document).querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const DAY = 86400000;
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const NF0 = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 });
+function startOfDay(d) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+function dayKey(ts) { const d = new Date(ts); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function longDate(d) { return d.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' }); }
+function shortDate(ts) { return new Date(ts).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
+function shorten(s, n) { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+function initial(name) { return (String(name || '').trim().charAt(0) || '?').toUpperCase(); }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function inlineMd(t) { return esc(String(t || '').trim()).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\n/g, '<br>'); }
+function md(src) {
+  const lines = String(src || '').replace(/\r/g, '').split('\n');
+  let html = '', list = null, para = [];
+  const inl = t => esc(t).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '<code>$1</code>');
+  const flushP = () => { if (para.length) { html += `<p>${para.map(inl).join('<br>')}</p>`; para = []; } };
+  const flushL = () => { if (list) { html += `<${list.t}>${list.items.map(i => `<li>${inl(i)}</li>`).join('')}</${list.t}>`; list = null; } };
+  lines.forEach(raw => {
+    const l = raw.replace(/\s+$/, ''); let m;
+    if (!l.trim()) { flushP(); flushL(); return; }
+    if ((m = l.match(/^#{1,4}\s+(.*)$/))) { flushP(); flushL(); html += `<h4>${inl(m[1])}</h4>`; return; }
+    if ((m = l.match(/^\s*[-*•]\s+(.*)$/))) { flushP(); if (!list || list.t !== 'ul') { flushL(); list = { t: 'ul', items: [] }; } list.items.push(m[1]); return; }
+    if ((m = l.match(/^\s*\d+[.)]\s+(.*)$/))) { flushP(); if (!list || list.t !== 'ol') { flushL(); list = { t: 'ol', items: [] }; } list.items.push(m[1]); return; }
+    flushL(); para.push(l.trim());
+  });
+  flushP(); flushL();
+  return html;
+}
+let toastTimer = null;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2400); }
+const ICON = {
+  chev: '<svg class="i chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M1.5 1.5 6.5 7l-5 5.5" stroke-width="2"/></svg>',
+  back: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke-width="2.4"/></svg>',
+  check: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17.5 19.5 7"/></svg>',
+  plus: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor" stroke="none"/><path d="M12 7.5v9M7.5 12h9" stroke="#fff" stroke-width="2.2"/></svg>',
+  plusNav: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-width="2.4"/></svg>',
+  up: '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+  book: '<svg class="i" viewBox="0 0 52 52" aria-hidden="true"><path d="M6 13c6.7-3.3 13.3-3.3 20 0v29c-6.7-3.3-13.3-3.3-20 0z"/><path d="M46 13c-6.7-3.3-13.3-3.3-20 0v29c6.7-3.3 13.3-3.3 20 0z"/></svg>',
+  cards: '<svg class="i" viewBox="0 0 52 52" aria-hidden="true"><rect x="8" y="15" width="30" height="28" rx="5"/><path d="M15 9h24a5 5 0 0 1 5 5v22"/></svg>'
+};
+const TYPING = '<span class="typing" role="img" aria-label="Lädt"><i></i><i></i><i></i></span>';
+const SKEL = '<div class="skel" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>';
+
+/* ================= Speicher ================= */
+const KEY = 'lernen-v1';
+function freshState() {
+  return { v: 1, profile: { name: '', program: '', style: 'einfach', quality: 'schnell', onboarded: false }, subjects: [], topics: {}, cards: [], stats: { answers: [], mistakes: [], days: [] }, last: null };
+}
+function valid(s) { return !!(s && s.v === 1 && s.profile && Array.isArray(s.subjects) && s.topics && Array.isArray(s.cards) && s.stats); }
+let state = (() => { try { const raw = localStorage.getItem(KEY); const s = raw ? JSON.parse(raw) : null; return valid(s) ? s : freshState(); } catch (e) { return freshState(); } })();
+state.stats.answers = state.stats.answers || []; state.stats.mistakes = state.stats.mistakes || []; state.stats.days = state.stats.days || [];
+let saveWarned = false;
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { if (!saveWarned) { saveWarned = true; toast('Speicher ist voll. Mach ein Backup und lösch alte Fächer.'); } } }
+let saveTimer = null;
+function saveSoon() { clearTimeout(saveTimer); saveTimer = setTimeout(save, 600); }
+
+/* Unterlagen-Texte liegen in IndexedDB, weil sie groß werden können */
+const IDB = (() => {
+  let dbp = null; const mem = new Map();
+  function open() {
+    if (!dbp) dbp = new Promise((res, rej) => {
+      try { const r = indexedDB.open('lernen', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }
+      catch (e) { rej(e); }
+    });
+    return dbp;
+  }
+  function tx(mode, fn) { return open().then(db => new Promise((res, rej) => { const st = db.transaction('kv', mode).objectStore('kv'); const r = fn(st); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); })); }
+  return {
+    get: k => tx('readonly', st => st.get(k)).catch(() => mem.get(k)),
+    set: (k, v) => tx('readwrite', st => st.put(v, k)).catch(() => { mem.set(k, v); }),
+    del: k => tx('readwrite', st => st.delete(k)).catch(() => { mem.delete(k); }),
+    keys: () => tx('readonly', st => st.getAllKeys()).catch(() => Array.from(mem.keys()))
+  };
+})();
+
+/* ================= Daten-Helfer ================= */
+const STAGES = { 1: 'Einfach', 2: 'Genauer', 3: 'Anwenden', 4: 'Eigene Worte' };
+const PASS = { 1: 0.5, 2: 0.6, 3: 0.6, 4: 0.6 };
+function subjectById(id) { return state.subjects.find(s => s.id === id) || null; }
+function topicsOf(sid) { const s = subjectById(sid); return s ? s.topics.map(id => state.topics[id]).filter(Boolean) : []; }
+function dueCards(sid) { const now = Date.now(); return state.cards.filter(c => c.due <= now && (!sid || c.subjectId === sid)); }
+function learnedCount(sid) { return topicsOf(sid).filter(t => t.status === 'gelernt').length; }
+function markActive() { const k = dayKey(Date.now()); if (state.stats.days.indexOf(k) < 0) { state.stats.days.push(k); if (state.stats.days.length > 120) state.stats.days = state.stats.days.slice(-120); } }
+function streak() {
+  const set = new Set(state.stats.days); let n = 0; let d = startOfDay(new Date());
+  if (!set.has(dayKey(d))) d = new Date(d.getTime() - DAY);
+  while (set.has(dayKey(d))) { n++; d = new Date(d.getTime() - DAY); }
+  return n;
+}
+function accuracy(sid) { const a = state.stats.answers.filter(x => !sid || x.s === sid).slice(-60); return { n: a.length, rate: a.length ? a.reduce((s, x) => s + x.c, 0) / a.length : 0 }; }
+function topicStatus(t) {
+  if (t.session && t.session.stage <= 4) return { text: `Stufe ${t.session.stage} von 4 · ${STAGES[t.session.stage]}`, cls: 'go', badge: 'tint' };
+  if (t.session && t.session.stage === 5) return { text: 'Wird abgeschlossen', cls: 'go', badge: 'tint' };
+  if (t.status === 'gelernt') return { text: `Gelernt · ${t.mastery} %`, cls: 'ok', badge: 'green' };
+  if (t.status === 'unsicher') return { text: `Noch unsicher · ${t.mastery} %`, cls: 'warn', badge: 'orange' };
+  return { text: 'Neu', cls: '', badge: '' };
+}
+function nextTopic(sid) { const ts = topicsOf(sid); return ts.find(t => t.session) || ts.find(t => t.status === 'neu') || ts.find(t => t.status === 'unsicher') || null; }
+function recordAnswer(t, correct, q, sol) {
+  const st = state.stats;
+  st.answers.push({ ts: Date.now(), s: t.subjectId, c: correct ? 1 : 0 });
+  if (st.answers.length > 400) st.answers = st.answers.slice(-400);
+  markActive();
+  if (!correct) {
+    st.mistakes.push({ ts: Date.now(), subjectId: t.subjectId, topicId: t.id, q: shorten(q, 160) });
+    if (st.mistakes.length > 40) st.mistakes = st.mistakes.slice(-40);
+    const s = t.session;
+    if (s && s.mistakeCards.length < 6 && !s.mistakeCards.some(c => c.front === q)) s.mistakeCards.push({ front: shorten(q, 300), back: shorten(sol || '', 500) });
+  }
+}
+
+/* ================= KI ================= */
+function getKey() { try { return localStorage.getItem('lernen-apikey') || localStorage.getItem('kevin-training-apikey') || ''; } catch (e) { return ''; } }
+function setKey(v) { try { if (v) localStorage.setItem('lernen-apikey', v); else localStorage.removeItem('lernen-apikey'); } catch (e) { /* egal */ } }
+function model() { return state.profile.quality === 'gruendlich' ? 'claude-sonnet-5-5' : 'claude-haiku-5-5'; }
+async function callAI(content, opts) {
+  opts = opts || {};
+  const key = getKey(); if (!key) throw { code: 'nokey' };
+  const body = { model: model(), max_tokens: opts.maxTokens || 2000, messages: [{ role: 'user', content }] };
+  if (opts.system) body.system = opts.system;
+  let res;
+  try { res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' }, body: JSON.stringify(body) }); }
+  catch (e) { throw { code: 'network' }; }
+  if (!res.ok) {
+    let msg = ''; try { const j = await res.json(); msg = (j && j.error && j.error.message) || ''; } catch (e) { /* egal */ }
+    throw { code: res.status === 401 || res.status === 403 ? 'bad_key' : res.status === 429 ? 'rate' : res.status >= 500 ? 'overloaded' : /credit|balance/i.test(msg) ? 'credit' : 'bad_request', msg };
+  }
+  const j = await res.json();
+  return (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('');
+}
+function parseJSON(t) {
+  t = String(t || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '');
+  try { return JSON.parse(t); } catch (e) { /* weiter */ }
+  const a = t.indexOf('{'), b = t.lastIndexOf('}');
+  if (a >= 0 && b > a) { try { return JSON.parse(t.slice(a, b + 1)); } catch (e) { /* weiter */ } }
+  return null;
+}
+async function callJSON(content, opts) { const o = parseJSON(await callAI(content, opts)); if (!o || typeof o !== 'object') throw { code: 'bad_json' }; return o; }
+function aiErrorText(e) {
+  switch (e && e.code) {
+    case 'nokey': return 'Kein KI-Schlüssel hinterlegt. Tipp auf Heute oben rechts auf deinen Buchstaben und trag ihn ein.';
+    case 'bad_key': return 'Der KI-Schlüssel stimmt nicht. Prüf ihn in den Einstellungen.';
+    case 'credit': return 'Dein KI-Guthaben ist aufgebraucht. Lad in der Anthropic Console etwas nach.';
+    case 'rate': return 'Gerade zu viele Anfragen. Warte kurz und versuch es nochmal.';
+    case 'overloaded': return 'Die KI ist gerade überlastet. Versuch es gleich nochmal.';
+    case 'network': return 'Keine Internetverbindung. Prüf dein Netz und versuch es nochmal.';
+    case 'bad_json': return 'Die Antwort der KI war unvollständig. Versuch es nochmal.';
+    default: return 'Das hat nicht geklappt. Versuch es nochmal.';
+  }
+}
+const SYSTEM = `Du bist ein geduldiger, direkter Tutor in einer Lern-App für Studierende. Du schreibst auf Deutsch, in Du-Form, klar und ohne Floskeln.
+Regeln:
+- Erst das Wesentliche, dann Details. Keine langen Einleitungen, kein „Gute Frage“.
+- Konkrete, alltagsnahe Beispiele mit Zahlen, wenn es passt.
+- Formeln als gut lesbarer Text mit Unicode (z. B. x̄ = (x₁ + x₂ + … + xₙ) / n, σ², √, ≤, ≥, ×, ·). Kein LaTeX, kein * für Multiplikation.
+- Formatierung nur mit **fett**, Spiegelstrichen „- “ und nummerierten Listen. Keine Tabellen, keine Überschriften mit #.
+- Halte dich an die Unterlagen des Studenten, wenn welche da sind. Erfinde keine Fakten; fehlt etwas, nutze anerkanntes Lehrbuchwissen.
+- Wenn JSON verlangt ist, antworte ausschließlich mit gültigem JSON ohne weiteren Text.`;
+function learnerProfile(sid) {
+  const p = state.profile, acc = accuracy(sid);
+  const level = acc.n < 6 ? 'noch keine Einschätzung' : acc.rate < 0.55 ? 'tut sich noch schwer: sehr einfach erklären, kleine Schritte, viele Beispiele' : acc.rate < 0.8 ? 'solides Grundverständnis' : 'kommt schnell voran: darf anspruchsvoller sein, weniger Wiederholung';
+  const styles = { einfach: 'mit leichten, einfachen Alltagsbeispielen', kurz: 'kurz und knapp, auf den Punkt', ausfuehrlich: 'ausführlich mit Hintergründen und Zusammenhängen' };
+  const mistakes = state.stats.mistakes.filter(m => !sid || m.subjectId === sid).slice(-5).map(m => `- ${m.q}`).join('\n');
+  return `LERNENDER
+Name: ${p.name || 'unbekannt'}${p.program ? ` · Studium: ${p.program}` : ''}
+Lernstil: erklärt bekommen ${styles[p.style] || styles.einfach}
+Trefferquote${sid ? ' in diesem Fach' : ''}: ${acc.n ? Math.round(acc.rate * 100) + ' % bei ' + acc.n + ' Antworten' : 'noch keine Daten'} → ${level}${mistakes ? '\nZuletzt falsch beantwortet:\n' + mistakes : ''}`;
+}
+function retrieve(text, terms, limit) {
+  if (!text) return '';
+  const chunks = [];
+  text.split(/\n\s*\n/).forEach(c => { c = c.trim(); if (c.length < 30) return; if (c.length <= 900) chunks.push(c); else for (let i = 0; i < c.length; i += 850) chunks.push(c.slice(i, i + 900)); });
+  const words = Array.from(new Set(terms.join(' ').toLowerCase().split(/[^a-zäöüß0-9]+/i).filter(w => w.length > 3)));
+  if (!words.length) return '';
+  const scored = chunks.map((c, i) => { const lc = c.toLowerCase(); let s = 0; words.forEach(w => { if (lc.indexOf(w) >= 0) s++; }); return { c, i, s }; }).filter(x => x.s > 0).sort((a, b) => b.s - a.s);
+  const out = []; let len = 0;
+  for (const x of scored) { if (len + x.c.length > limit) continue; out.push(x); len += x.c.length; if (len > limit * 0.9) break; }
+  return out.sort((a, b) => a.i - b.i).map(x => x.c).join('\n---\n');
+}
+async function materialText(sid) {
+  const s = subjectById(sid); if (!s || !s.materials.length) return '';
+  const texts = await Promise.all(s.materials.map(m => IDB.get('mat:' + m.id).then(t => t || '').catch(() => '')));
+  return texts.join('\n\n');
+}
+async function topicContext(t) {
+  const subj = subjectById(t.subjectId);
+  const all = await materialText(t.subjectId);
+  const snippets = retrieve(all, [t.title].concat(t.keywords || []), 6000);
+  return `FACH: ${subj ? subj.name : ''}
+THEMA: ${t.title}${t.goal ? '\nLERNZIEL: ' + t.goal : ''}${t.notes ? '\nKERNINHALTE AUS DEN UNTERLAGEN:\n' + t.notes : ''}${snippets ? '\nPASSENDE STELLEN AUS DEN UNTERLAGEN:\n' + snippets : ''}${!t.notes && !snippets ? '\n(Keine Unterlagen zu diesem Thema – nutze anerkanntes Lehrbuchwissen auf Hochschulniveau.)' : ''}`;
+}
+
+/* ================= Lernsession: Inhalte erzeugen ================= */
+function newSession() { return { stage: 1, content: {}, answers: { 1: {}, 2: {}, 3: {}, 4: '' }, results: { 1: {}, 2: {}, 3: {}, 4: null }, notes: {}, hints: {}, scores: {}, round3: 1, skipped: false, mistakeCards: [], qa: [], err: null, finish: null }; }
+function itemsOf(s, st) { const c = s.content[st]; return !c ? [] : st === 3 ? c.tasks : c.check; }
+function stageScore(s, st) {
+  const items = itemsOf(s, st); if (!items.length) return null;
+  let sum = 0;
+  for (let i = 0; i < items.length; i++) { const r = s.results[st][i]; if (!r || r.score == null) return null; sum += r.score; }
+  return sum / items.length;
+}
+function normalizeStage(o, st) {
+  if (st === 3) {
+    const tasks = (Array.isArray(o.tasks) ? o.tasks : []).filter(x => x && x.q).slice(0, 4).map(x => ({ type: 'open', q: String(x.q), hint: String(x.hint || ''), solution: String(x.solution || '') }));
+    if (!tasks.length) throw { code: 'bad_json' };
+    return { tasks };
+  }
+  const explanation = String(o.explanation || '').trim();
+  const check = (Array.isArray(o.check) ? o.check : []).filter(x => x && x.q).slice(0, 4).map(x => {
+    const opts = Array.isArray(x.options) ? x.options.map(v => String(v)).filter(Boolean).slice(0, 5) : [];
+    if (x.type === 'open' || opts.length < 2) return { type: 'open', q: String(x.q), solution: String(x.solution || x.why || '') };
+    let a = parseInt(x.answer, 10); if (!(a >= 0 && a < opts.length)) a = 0;
+    const order = shuffle(opts.map((_, i) => i));
+    return { type: 'mc', q: String(x.q), options: order.map(i => opts[i]), answer: order.indexOf(a), why: String(x.why || '') };
+  });
+  if (!explanation || !check.length) throw { code: 'bad_json' };
+  return { explanation, check };
+}
+async function genStage(t, st) {
+  const s = t.session, prog = state.profile.program ? ` – gern passend zu seinem Studium (${state.profile.program})` : '';
+  const head = `${learnerProfile(t.subjectId)}\n\n${await topicContext(t)}\n\n`;
+  let task;
+  if (st === 1) task = `AUFGABE: Stufe 1 von 4 – „Einfach erklärt“.
+Erkläre das Thema so, dass es jemand ohne Vorwissen sofort versteht: 90–160 Wörter, mit einem konkreten Alltagsbeispiel${prog}. Fachbegriffe nur mit Erklärung.
+Danach 2 kurze Verständnisfragen als Multiple Choice mit je 3 oder 4 Antworten, genau eine richtig, die falschen plausibel.
+${s.notes[1] || ''}
+Antworte nur mit JSON in dieser Form („answer“ = Index der richtigen Antwort, beginnend bei 0):
+{"explanation":"...","check":[{"type":"mc","q":"...","options":["...","...","..."],"answer":0,"why":"1 Satz, warum"}]}`;
+  else if (st === 2) task = `AUFGABE: Stufe 2 von 4 – „Genauer“. Die einfache Erklärung hatte er schon.
+Erkläre das Thema jetzt genauer, wie in einer guten Vorlesung, aber verständlich: 180–320 Wörter. Mit den wichtigen Fachbegriffen (fett), ggf. Formeln und einem Beispiel, das Schritt für Schritt durchgerechnet oder durchgespielt wird.
+Danach 3 Fragen: 2× Multiple Choice und 1 offene Frage, die man in 1–3 Sätzen oder mit einer kurzen Rechnung beantwortet.
+${s.notes[2] || ''}
+Antworte nur mit JSON in dieser Form („answer“ = Index ab 0):
+{"explanation":"...","check":[{"type":"mc","q":"...","options":["...","...","..."],"answer":1,"why":"..."},{"type":"mc","q":"...","options":["...","...","..."],"answer":0,"why":"..."},{"type":"open","q":"...","solution":"kurze Musterlösung"}]}`;
+  else task = `AUFGABE: Stufe 3 von 4 – „Anwenden“.
+Stell 3 Übungsaufgaben, die zeigen, ob er das Thema wirklich kann: steigende Schwierigkeit, Anwendung statt Auswendiglernen. Bei Rechenthemen echte Rechenaufgaben mit konkreten Zahlen, sonst kurze Fallfragen aus der Praxis${prog}.
+Jede Aufgabe muss in 1–5 Sätzen oder einer kurzen Rechnung lösbar sein.
+${s.notes[3] || ''}
+Antworte nur mit JSON in dieser Form:
+{"tasks":[{"q":"...","hint":"kleiner Tipp ohne die Lösung","solution":"Musterlösung mit Rechenweg"}]}`;
+  const o = await callJSON(head + task, { maxTokens: st === 2 ? 3200 : 2400, system: SYSTEM });
+  return normalizeStage(o, st);
+}
+const inflight = {};
+function ensureStage(t, st) {
+  const s = t.session; if (!s || st > 3) return;
+  if (s.content[st]) { if (st === 1) ensureStage(t, 2); return; }
+  const key = t.id + ':' + st + ':' + (s.notes[st] || '').length + ':' + s.round3;
+  if (inflight[key]) return;
+  if (s.stage === st) s.err = null;
+  inflight[key] = genStage(t, st).then(content => {
+    if (t.session !== s || s.content[st]) return;
+    s.content[st] = content; save();
+    if (sessTopic() === t) renderSession(true);
+    if (st === 1) ensureStage(t, 2);
+  }).catch(e => {
+    if (t.session !== s) return;
+    if (s.stage === st) { s.err = aiErrorText(e); if (sessTopic() === t) renderSession(true); }
+  }).finally(() => { delete inflight[key]; });
+}
+
+/* ================= Lernsession: Ablauf ================= */
+let sess = null;
+function sessTopic() { return sess ? state.topics[sess.topicId] || null : null; }
+function openSession(topicId, fresh) {
+  const t = state.topics[topicId]; if (!t) return;
+  closeSheet();
+  if (fresh || !t.session) t.session = newSession();
+  if (!(t.status === 'gelernt' && t.session.stage === 5)) t.status = t.status === 'neu' ? 'aktiv' : t.status;
+  state.last = { topicId, ts: Date.now() };
+  markActive(); save();
+  sess = { topicId };
+  $('#overlay').hidden = false;
+  renderSession();
+  if (t.session.stage <= 3) ensureStage(t, t.session.stage);
+  if (t.session.stage === 5 && !t.session.finish) runFinish(t);
+}
+function closeSession() {
+  sess = null; $('#overlay').hidden = true; $('#overlay').innerHTML = ''; save(); render(true);
+}
+function stagebar(s) {
+  return `<div class="stagebar">${[1, 2, 3, 4].map(n => `<div class="stg${n < s.stage ? ' done' : n === s.stage ? ' now' : ''}"><i></i><span>${STAGES[n]}</span></div>`).join('')}</div>`;
+}
+function qHTML(t, st, q, qi) {
+  const s = t.session, r = s.results[st][qi], ans = s.answers[st][qi];
+  const head = `<p class="q-num">${st === 3 ? 'Aufgabe' : 'Frage'} ${qi + 1}</p><p class="q-text">${inlineMd(q.q)}</p>`;
+  if (q.type === 'mc') {
+    const answered = r && r.chosen != null;
+    return `<div class="card q">${head}<div class="opts">${q.options.map((o, oi) => {
+      let cls = 'opt';
+      if (answered) cls += oi === q.answer ? ' right' : oi === r.chosen ? ' wrong' : ' dim';
+      return `<button type="button" class="${cls}" data-act="mc" data-q="${qi}" data-o="${oi}"${answered ? ' disabled' : ''}><span class="opt-mark">${'ABCDE'[oi]}</span><span>${inlineMd(o)}</span></button>`;
+    }).join('')}</div>${answered ? `<div class="fb ${r.correct ? 'ok' : 'no'}"><strong>${r.correct ? 'Richtig.' : 'Nicht ganz.'}</strong> ${inlineMd(q.why)}</div>` : ''}</div>`;
+  }
+  const done = r && r.score != null, loading = r && r.loading;
+  const hintKey = st + ':' + qi;
+  return `<div class="card q">${head}
+    ${q.hint && !done ? (s.hints[hintKey] ? `<div class="hint"><strong>Tipp:</strong> ${inlineMd(q.hint)}</div>` : `<button type="button" class="link" data-act="hint" data-q="${qi}">Tipp anzeigen</button>`) : ''}
+    <label class="sr" for="ans-${st}-${qi}">Deine Antwort</label>
+    <textarea class="ans" id="ans-${st}-${qi}" rows="3" data-st="${st}" data-q="${qi}" placeholder="${st === 3 ? 'Deine Lösung, gern mit Rechenweg' : 'Deine Antwort in eigenen Worten'}"${done || loading ? ' readonly' : ''}>${esc(ans || '')}</textarea>
+    ${loading ? `<div class="fb wait">${TYPING}<span>Wird geprüft …</span></div>` : ''}
+    ${r && r.err ? `<div class="fb no">${esc(r.err)}</div>` : ''}
+    ${done ? `<div class="fb ${r.score >= 1 ? 'ok' : r.score > 0 ? 'mid' : 'no'}"><strong>${r.score >= 1 ? 'Richtig.' : r.score > 0 ? 'Teilweise richtig.' : 'Leider falsch.'}</strong> ${inlineMd(r.feedback)}${r.score < 1 ? `<details><summary>Musterlösung</summary><div class="md">${md(r.solution || q.solution)}</div></details>` : ''}</div>` : (loading ? '' : `<button type="button" class="btn tinted small" data-act="grade" data-q="${qi}">Antwort prüfen</button>`)}
+  </div>`;
+}
+function renderSession(keep) {
+  const t = sessTopic(); if (!t) return;
+  const s = t.session, o = $('#overlay');
+  const prevBody = $('#sessBody'), sc = keep && prevBody ? prevBody.scrollTop : 0;
+  const active = document.activeElement && document.activeElement.id && o.contains(document.activeElement) ? document.activeElement.id : null;
+  const st = s.stage;
+  let body = '', foot = '';
+  if (st <= 3) {
+    const c = s.content[st];
+    if (!c) {
+      body = s.err ? `<div class="card"><p class="headline">Hat nicht geklappt</p><p class="sub">${esc(s.err)}</p><button type="button" class="btn tinted small" data-act="sess-retry">Nochmal versuchen</button></div>`
+        : `<div class="card"><p class="cap">Stufe ${st} · ${STAGES[st]}</p><p class="sub">${st === 3 ? 'Aufgaben werden erstellt …' : 'Erklärung wird vorbereitet …'}</p>${SKEL}</div>`;
+      foot = `<button type="button" class="btn filled" disabled>${st === 3 ? 'Aufgaben werden erstellt …' : 'Einen Moment …'}</button>`;
+    } else {
+      if (st < 3) body += `<div class="card"><p class="cap">Stufe ${st} · ${STAGES[st]}</p><div class="md">${md(c.explanation)}</div></div><h2 class="sec-title" style="margin-top:6px">Kurz prüfen</h2>`;
+      else body += `<div class="card"><p class="cap">Stufe 3 · Anwenden${s.round3 > 1 ? ` · Runde ${s.round3}` : ''}</p><p class="sub">Löse die Aufgaben selbst. Erst wenn du die meisten schaffst, geht es weiter.</p></div>`;
+      body += itemsOf(s, st).map((q, qi) => qHTML(t, st, q, qi)).join('');
+      const items = itemsOf(s, st), answered = items.filter((_, i) => s.results[st][i] && s.results[st][i].score != null).length, score = stageScore(s, st);
+      if (score == null) foot = `<button type="button" class="btn filled" disabled>${answered} von ${items.length} beantwortet</button>`;
+      else if (score >= PASS[st]) foot = `<p class="foot-note">${score >= 1 ? 'Alles richtig. Stark!' : Math.round(score * 100) + ' % richtig. Das reicht, weiter geht’s.'}</p><button type="button" class="btn filled" data-act="next">Weiter: ${STAGES[st + 1]}</button>`;
+      else foot = `<p class="foot-note">${Math.round(score * 100)} % richtig. Das sitzt noch nicht.</p><div class="btn-row"><button type="button" class="btn tinted" data-act="redo">${st === 3 ? 'Neue Aufgaben' : 'Anders erklären'}</button><button type="button" class="btn plain" data-act="skip">Trotzdem weiter</button></div>`;
+    }
+  } else if (st === 4) {
+    const r = s.results[4];
+    body = `<div class="card"><p class="cap">Stufe 4 · Eigene Worte</p><p class="headline">Erklär „${esc(t.title)}“ jetzt selbst.</p><p class="sub">3–5 Sätze, so als würdest du es einem Kommilitonen erklären. Nicht nachschauen: Genau hier merkst du, ob du es wirklich kannst.</p></div>
+      <div class="card q"><label class="sr" for="ans-4-0">Deine Zusammenfassung</label><textarea class="ans" id="ans-4-0" rows="6" data-st="4" data-q="0" placeholder="Deine Zusammenfassung …"${r && (r.loading || r.score != null) ? ' readonly' : ''}>${esc(s.answers[4] || '')}</textarea>
+      ${r && r.loading ? `<div class="fb wait">${TYPING}<span>Wird geprüft …</span></div>` : ''}
+      ${r && r.err ? `<div class="fb no">${esc(r.err)}</div>` : ''}
+      ${r && r.score != null ? `<div class="fb ${r.score >= PASS[4] ? 'ok' : r.score > 0.3 ? 'mid' : 'no'}"><strong>${Math.round(r.score * 100)} %.</strong> ${inlineMd(r.feedback)}${r.good.length ? `<p style="margin-top:8px"><strong style="color:var(--green)">Gut:</strong></p><ul>${r.good.map(x => `<li>${inlineMd(x)}</li>`).join('')}</ul>` : ''}${r.missing.length ? `<p style="margin-top:8px"><strong style="color:var(--orange)">Fehlt noch:</strong></p><ul>${r.missing.map(x => `<li>${inlineMd(x)}</li>`).join('')}</ul>` : ''}${r.wrong.length ? `<p style="margin-top:8px"><strong>Stimmt so nicht:</strong></p><ul>${r.wrong.map(x => `<li>${inlineMd(x)}</li>`).join('')}</ul>` : ''}</div>` : ''}</div>`;
+    if (!r || r.err) foot = `<button type="button" class="btn filled" data-act="grade-sum">Abgeben</button>`;
+    else if (r.loading) foot = `<button type="button" class="btn filled" disabled>Wird geprüft …</button>`;
+    else if (r.score >= PASS[4]) foot = `<button type="button" class="btn green" data-act="next">Abschließen</button>`;
+    else foot = `<div class="btn-row"><button type="button" class="btn tinted" data-act="sum-again">Überarbeiten</button><button type="button" class="btn plain" data-act="skip">Trotzdem abschließen</button></div>`;
+  } else {
+    const f = s.finish;
+    if (!f || f.loading) { body = `<div class="card"><p class="headline">Fast geschafft</p><p class="sub">Dein Lernzettel und deine Karteikarten werden erstellt …</p>${SKEL}</div>`; foot = `<button type="button" class="btn filled" disabled>Einen Moment …</button>`; }
+    else if (f.err) { body = `<div class="card"><p class="headline">Lernzettel hat nicht geklappt</p><p class="sub">${esc(f.err)}</p></div>`; foot = `<div class="btn-row"><button type="button" class="btn tinted" data-act="finish-retry">Nochmal versuchen</button><button type="button" class="btn plain" data-act="finish-skip">Ohne abschließen</button></div>`; }
+    else {
+      const ok = f.status === 'gelernt';
+      body = `<div class="done-badge${ok ? '' : ' warn'}"><span>${f.mastery}%</span></div>
+        <p class="title2 center">${ok ? 'Thema sitzt!' : 'Fast, aber noch unsicher'}</p>
+        <p class="sub center">${ok ? 'Die wichtigsten Punkte kommen jetzt als Karteikarten in deine Wiederholung.' : 'Die schwierigen Stellen kommen als Karteikarten in deine Wiederholung. Lern das Thema später nochmal.'}</p>
+        <div class="stats3">${[1, 2, 3].map(n => `<div class="stat"><span class="stat-num">${s.scores[n] != null ? Math.round(s.scores[n] * 100) : '–'}${s.scores[n] != null ? '%' : ''}</span><span class="stat-lbl">${STAGES[n]}</span></div>`).join('')}</div>
+        <p class="cap pad">Dein Lernzettel</p>
+        <div class="card"><div class="md">${md(f.sheet || 'Kein Lernzettel.')}</div></div>
+        <p class="foot">${f.newCards} neue Karteikarten${f.mistakeCards ? `, davon ${f.mistakeCards} aus deinen Fehlern` : ''}. Den Lernzettel findest du jederzeit beim Thema.</p>`;
+      foot = `<button type="button" class="btn filled" data-act="finish-done">Fertig</button>`;
+    }
+  }
+  o.innerHTML = `<div class="wo-nav"><button type="button" class="nav-btn" data-act="sess-close">Schließen</button><span class="nav-title">${esc(t.title)}</span><button type="button" class="nav-btn strong end" data-act="ask"${st > 4 ? ' hidden' : ''}>Frage?</button></div>
+    ${st <= 4 ? stagebar(s) : ''}
+    <div class="wo-body" id="sessBody">${body}</div>
+    <div class="wo-foot">${foot}</div>`;
+  const nb = $('#sessBody'); if (nb) nb.scrollTop = sc;
+  if (active) { const el = document.getElementById(active); if (el && !el.readOnly) { try { el.focus({ preventScroll: true }); } catch (e) { /* egal */ } } }
+}
+function answerMC(qi, oi) {
+  const t = sessTopic(); if (!t) return;
+  const s = t.session, st = s.stage, q = itemsOf(s, st)[qi];
+  if (!q || (s.results[st][qi] && s.results[st][qi].chosen != null)) return;
+  const correct = oi === q.answer;
+  s.results[st][qi] = { chosen: oi, correct, score: correct ? 1 : 0 };
+  recordAnswer(t, correct, q.q, `${q.options[q.answer]}${q.why ? ' – ' + q.why : ''}`);
+  save(); renderSession(true); afterAnswer(t);
+}
+async function gradeOpen(qi) {
+  const t = sessTopic(); if (!t) return;
+  const s = t.session, st = s.stage, q = itemsOf(s, st)[qi], ans = String(s.answers[st][qi] || '').trim();
+  if (!q) return;
+  if (ans.length < 2) { toast('Schreib erst eine Antwort.'); return; }
+  s.results[st][qi] = { loading: true }; renderSession(true);
+  try {
+    const o = await callJSON(`${learnerProfile(t.subjectId)}
+
+THEMA: ${t.title}
+FRAGE: ${q.q}
+MUSTERLÖSUNG: ${q.solution || '(keine, bewerte fachlich)'}
+ANTWORT DES STUDENTEN: ${ans}
+
+Bewerte fair und genau:
+- Entscheidend ist, ob er es verstanden hat. Eigene Worte sind völlig okay.
+- Bei Rechnungen zählen richtiges Ergebnis und nachvollziehbarer Weg; kleine Rundungsunterschiede sind okay.
+- score: 1 = richtig, 0.5 = teilweise richtig, 0 = falsch oder leer.
+- feedback: 1–3 Sätze, direkt; sag konkret, was stimmt und was fehlt oder falsch ist.
+Antworte nur mit JSON: {"score":1,"feedback":"...","solution":"kurze richtige Lösung"}`, { maxTokens: 800, system: SYSTEM });
+    let sc = Number(o.score); if (!isFinite(sc)) sc = o.correct ? 1 : 0;
+    sc = sc >= 0.75 ? 1 : sc >= 0.25 ? 0.5 : 0;
+    s.results[st][qi] = { score: sc, feedback: String(o.feedback || ''), solution: String(o.solution || q.solution || '') };
+    recordAnswer(t, sc >= 1, q.q, o.solution || q.solution);
+  } catch (e) { s.results[st][qi] = { err: aiErrorText(e) }; }
+  save();
+  if (sessTopic() === t && t.session === s) { renderSession(true); afterAnswer(t); }
+}
+function afterAnswer(t) { const s = t.session; if (s.stage === 2 && stageScore(s, 2) != null) ensureStage(t, 3); }
+function wrongList(s, st) { return itemsOf(s, st).filter((_, i) => s.results[st][i] && s.results[st][i].score < 1).map(q => '- ' + shorten(q.q, 200)).join('\n'); }
+function nextStage(skipped) {
+  const t = sessTopic(); if (!t) return;
+  const s = t.session, st = s.stage;
+  if (st <= 3) s.scores[st] = stageScore(s, st);
+  if (st === 4) s.scores[4] = s.results[4] && s.results[4].score != null ? s.results[4].score : 0;
+  if (skipped) s.skipped = true;
+  s.stage = st + 1; s.err = null;
+  save(); renderSession();
+  const b = $('#sessBody'); if (b) b.scrollTop = 0;
+  if (s.stage <= 3) ensureStage(t, s.stage);
+  if (s.stage === 5) runFinish(t);
+}
+function redoStage() {
+  const t = sessTopic(); if (!t) return;
+  const s = t.session, st = s.stage, wrong = wrongList(s, st);
+  if (st === 3) { s.round3++; s.notes[3] = `NEUER VERSUCH (Runde ${s.round3}): Diese Aufgaben hat er nicht geschafft:\n${wrong}\nStell 3 neue, etwas einfachere Aufgaben genau zu diesen Schwachstellen.`; }
+  else s.notes[st] = `NEUER VERSUCH: Beim ersten Mal hat er diese Fragen nicht geschafft:\n${wrong}\nErkläre es diesmal anders: mit einem anderen Beispiel, kleineren Schritten und noch einfacher. Stell neue Fragen.`;
+  delete s.content[st]; s.results[st] = {}; s.answers[st] = {}; s.hints = {}; s.err = null;
+  if (st === 2) { delete s.content[3]; s.results[3] = {}; s.answers[3] = {}; }
+  save(); renderSession(); ensureStage(t, st);
+}
+async function gradeSummary() {
+  const t = sessTopic(); if (!t) return;
+  const s = t.session, text = String(s.answers[4] || '').trim();
+  if (text.length < 40) { toast('Schreib ein paar Sätze mehr.'); return; }
+  s.results[4] = { loading: true }; renderSession(true);
+  try {
+    const ref = s.content[2] ? s.content[2].explanation : '';
+    const o = await callJSON(`${learnerProfile(t.subjectId)}
+
+${await topicContext(t)}
+REFERENZ-ERKLÄRUNG AUS DER SESSION:
+${ref}
+
+AUFGABE: Der Student hat das Thema in eigenen Worten zusammengefasst. Prüf, ob die wichtigsten Punkte drin und fachlich richtig sind. Eigene Formulierungen sind gut.
+ZUSAMMENFASSUNG DES STUDENTEN:
+${text}
+
+Antworte nur mit JSON: {"score":0.8,"good":["was richtig und gut ist"],"missing":["wichtiger Punkt, der fehlt"],"wrong":["was fachlich falsch ist"],"feedback":"1–2 Sätze"} (score von 0 bis 1, jede Liste höchstens 3 kurze Punkte, leere Listen erlaubt)`, { maxTokens: 900, system: SYSTEM });
+    let sc = Number(o.score); if (!isFinite(sc)) sc = 0; sc = clamp(sc, 0, 1);
+    const arr = v => (Array.isArray(v) ? v : []).map(String).filter(Boolean).slice(0, 3);
+    s.results[4] = { score: sc, feedback: String(o.feedback || ''), good: arr(o.good), missing: arr(o.missing), wrong: arr(o.wrong) };
+    state.stats.answers.push({ ts: Date.now(), s: t.subjectId, c: sc >= PASS[4] ? 1 : 0 });
+    if (sc < PASS[4] && s.mistakeCards.length < 6) s.mistakeCards.push({ front: `Erklär in eigenen Worten: ${t.title}`, back: shorten((arr(o.missing).concat(arr(o.wrong))).join(' · ') || o.feedback || '', 500) });
+  } catch (e) { s.results[4] = { err: aiErrorText(e) }; }
+  save();
+  if (sessTopic() === t) renderSession(true);
+}
+async function runFinish(t) {
+  const s = t.session; if (!s) return;
+  s.finish = { loading: true };
+  if (sessTopic() === t) renderSession();
+  try {
+    const ref = s.content[2] ? s.content[2].explanation : '';
+    const o = await callJSON(`${learnerProfile(t.subjectId)}
+
+${await topicContext(t)}
+ERKLÄRUNG AUS DER SESSION:
+${ref}
+
+AUFGABE: Erstelle zum Abschluss
+1. einen Lernzettel: kompakt (120–220 Wörter), mit den wichtigsten Begriffen, Formeln und einem Mini-Beispiel. Spiegelstriche, wichtige Begriffe **fett**.
+2. 4 Karteikarten (front: Frage oder Begriff, back: kurze Antwort mit höchstens 30 Wörtern).
+Antworte nur mit JSON: {"sheet":"...","cards":[{"front":"...","back":"..."}]}`, { maxTokens: 2200, system: SYSTEM });
+    finishTopic(t, String(o.sheet || ''), Array.isArray(o.cards) ? o.cards : []);
+  } catch (e) { if (t.session === s) s.finish = { err: aiErrorText(e) }; }
+  save();
+  if (sessTopic() === t) renderSession();
+}
+function finishTopic(t, sheet, aiCards) {
+  const s = t.session, sc = s.scores;
+  const part = n => sc[n] != null ? sc[n] : 0.5;
+  const mastery = Math.round(100 * (part(1) * 0.15 + part(2) * 0.25 + part(3) * 0.35 + part(4) * 0.25));
+  const status = mastery >= 70 && !s.skipped ? 'gelernt' : 'unsicher';
+  const due = startOfDay(new Date()).getTime() + DAY;
+  const existing = new Set(state.cards.filter(c => c.topicId === t.id).map(c => c.front));
+  let added = 0, fromMistakes = 0;
+  const add = (front, back, src) => { front = shorten(front, 300); back = shorten(back, 500); if (!front || !back || existing.has(front)) return; existing.add(front); state.cards.push({ id: uid(), subjectId: t.subjectId, topicId: t.id, front, back, box: 1, due, created: Date.now(), src }); added++; if (src === 'fehler') fromMistakes++; };
+  s.mistakeCards.forEach(c => add(c.front, c.back, 'fehler'));
+  aiCards.slice(0, 6).forEach(c => c && add(String(c.front || ''), String(c.back || ''), 'zettel'));
+  t.sheet = sheet || t.sheet || '';
+  t.mastery = mastery; t.status = status; t.learnedAt = Date.now(); t.attempts = (t.attempts || 0) + 1;
+  s.finish = { mastery, status, sheet: t.sheet, newCards: added, mistakeCards: fromMistakes };
+  markActive();
+}
+
+/* ================= Frage während der Session ================= */
+function askHTML(s) {
+  if (!s.qa.length) return '<p class="sub">Frag einfach, was unklar ist. Danach geht es genau da weiter, wo du warst.</p>';
+  return s.qa.map(m => `<div class="msg ${m.role === 'me' ? 'me' : 'ai'}"><div class="bubble">${m.loading ? TYPING : m.role === 'me' ? esc(m.text) : `<div class="md" style="font-size:16px">${md(m.text)}</div>`}</div></div>`).join('');
+}
+function openAsk() {
+  const t = sessTopic(); if (!t) return;
+  openSheet(sheetNav('Frage zum Thema', '', '<button type="button" class="nav-btn strong end" data-act="sheet-close">Zurück</button>') + `<div class="sheet-body"><p class="cap pad" style="padding-left:0">${esc(t.title)}</p><div class="msgs" id="askMsgs">${askHTML(t.session)}</div><form class="chat-form" id="askForm" autocomplete="off"><label class="sr" for="askInput">Deine Frage</label><input id="askInput" type="text" placeholder="Was ist unklar?" maxlength="500" enterkeyhint="send"><button class="send" type="submit" aria-label="Senden">${ICON.up}</button></form></div>`);
+  setTimeout(() => { const i = $('#askInput'); if (i) i.focus(); }, 250);
+}
+async function sendAsk(text) {
+  const t = sessTopic(); if (!t || !text.trim()) return;
+  const s = t.session;
+  s.qa.push({ role: 'me', text: text.trim() });
+  const pending = { role: 'ai', text: '', loading: true }; s.qa.push(pending);
+  const box = $('#askMsgs'); if (box) box.innerHTML = askHTML(s);
+  try {
+    const cur = s.stage <= 2 && s.content[s.stage] ? s.content[s.stage].explanation : s.content[2] ? s.content[2].explanation : s.content[1] ? s.content[1].explanation : '';
+    const hist = s.qa.slice(0, -2).slice(-6).map(m => `${m.role === 'me' ? 'Student' : 'Tutor'}: ${m.text}`).join('\n');
+    pending.text = (await callAI(`${learnerProfile(t.subjectId)}
+
+${await topicContext(t)}
+BISHERIGE ERKLÄRUNG IN DIESER SESSION:
+${cur}
+${hist ? '\nBISHERIGE FRAGEN:\n' + hist : ''}
+
+FRAGE DES STUDENTEN: ${text.trim()}
+Antworte kurz (höchstens 120 Wörter), konkret, mit Beispiel wenn es hilft. Verrate keine Lösungen zu offenen Aufgaben der Session, sondern gib einen Denkanstoß.`, { maxTokens: 700, system: SYSTEM })).trim();
+  } catch (e) { pending.text = aiErrorText(e); }
+  pending.loading = false;
+  if (s.qa.length > 20) s.qa = s.qa.slice(-20);
+  save();
+  const b2 = $('#askMsgs'); if (b2) { b2.innerHTML = askHTML(s); const sb = $('.sheet-body'); if (sb) sb.scrollTop = sb.scrollHeight; }
+}
+
+/* ================= Karteikarten ================= */
+const BOX_DAYS = [0, 1, 3, 7, 16, 35];
+let review = null;
+function startReview(sid) {
+  const due = dueCards(sid).sort((a, b) => a.due - b.due).slice(0, 40);
+  if (!due.length) { toast('Gerade ist nichts fällig. Stark!'); return; }
+  review = { queue: due.map(c => c.id), idx: 0, revealed: false, known: 0, again: 0, requeued: {} };
+  $('#overlay').hidden = false; renderReview();
+}
+function renderReview() {
+  const o = $('#overlay');
+  if (review.idx >= review.queue.length) {
+    o.innerHTML = `<div class="wo-nav"><span></span><span class="nav-title">Wiederholung</span><span></span></div>
+      <div class="wo-body"><div class="done-badge">${ICON.check}</div><p class="title2 center">Fertig für heute</p><p class="sub center">${review.known} gewusst · ${review.again} nochmal geübt</p><p class="sub center">Was du wusstest, kommt erst in ein paar Tagen wieder. So bleibt es langfristig hängen.</p></div>
+      <div class="wo-foot"><button type="button" class="btn filled" data-act="review-done">Fertig</button></div>`;
+    return;
+  }
+  const c = state.cards.find(x => x.id === review.queue[review.idx]);
+  if (!c) { review.idx++; renderReview(); return; }
+  const t = state.topics[c.topicId], subj = subjectById(c.subjectId);
+  o.innerHTML = `<div class="wo-nav"><button type="button" class="nav-btn" data-act="review-done">Beenden</button><span class="nav-title">Karteikarten</span><span class="nav-btn end" style="color:var(--label-2)">${review.idx + 1} / ${review.queue.length}</span></div>
+    <div class="wo-body">
+      <div class="flash"><p class="cap">${esc(subj ? subj.name : '')}${t ? ' · ' + esc(t.title) : ''}${c.src === 'fehler' ? ' · aus deinen Fehlern' : ''}</p><p class="front">${inlineMd(c.front)}</p>${review.revealed ? `<hr><div class="back md">${md(c.back)}</div>` : '<p class="sub">Überleg dir die Antwort, bevor du sie aufdeckst.</p>'}</div>
+    </div>
+    <div class="wo-foot">${review.revealed ? `<div class="btn-row"><button type="button" class="btn plain" data-act="rv-again" style="color:var(--red)">Nochmal</button><button type="button" class="btn green" data-act="rv-known">Gewusst</button></div>` : `<button type="button" class="btn filled" data-act="rv-reveal">Antwort zeigen</button>`}</div>`;
+}
+function rateCard(known) {
+  const c = state.cards.find(x => x.id === review.queue[review.idx]);
+  if (c) {
+    if (known) { c.box = Math.min(5, (c.box || 1) + 1); c.due = startOfDay(new Date()).getTime() + BOX_DAYS[c.box] * DAY; review.known++; }
+    else {
+      c.box = 1; c.due = Date.now(); review.again++;
+      if ((review.requeued[c.id] || 0) < 2) { review.requeued[c.id] = (review.requeued[c.id] || 0) + 1; review.queue.push(c.id); }
+      else c.due = startOfDay(new Date()).getTime() + DAY;
+    }
+    state.stats.answers.push({ ts: Date.now(), s: c.subjectId, c: known ? 1 : 0 });
+    markActive(); save();
+  }
+  review.idx++; review.revealed = false; renderReview();
+}
+
+/* ================= Probeklausur ================= */
+let exam = null;
+async function startExam(sid) {
+  const subj = subjectById(sid); if (!subj) return;
+  const ts = topicsOf(sid);
+  const pool = ts.filter(t => t.status === 'gelernt' || t.status === 'unsicher');
+  const use = pool.length ? pool : ts;
+  if (!use.length) { toast('Leg erst Themen an.'); return; }
+  closeSheet();
+  exam = { sid, status: 'loading', tasks: [], answers: {}, results: null, summary: '', err: '' };
+  $('#overlay').hidden = false; renderExam();
+  try {
+    const list = use.slice(0, 14).map(t => `THEMA: ${t.title}\n${shorten(t.notes || t.sheet || t.goal || '', 700)}`).join('\n\n');
+    const o = await callJSON(`${learnerProfile(sid)}
+
+FACH: ${subj.name}
+${list}
+
+AUFGABE: Erstelle eine Probeklausur mit 5 Aufgaben auf Klausurniveau zu diesen Themen. Mische Verständnisfragen, Rechen- oder Anwendungsaufgaben und eine Transferaufgabe. Jede Aufgabe ist in höchstens 10 Minuten lösbar. Vergib 2 bis 6 Punkte je Aufgabe.
+Antworte nur mit JSON: {"tasks":[{"topic":"Thementitel","q":"...","points":4,"solution":"Musterlösung mit Bewertungskriterien"}]}`, { maxTokens: 3500, system: SYSTEM });
+    const tasks = (Array.isArray(o.tasks) ? o.tasks : []).filter(x => x && x.q).slice(0, 6).map(x => ({ topic: String(x.topic || ''), q: String(x.q), points: clamp(parseInt(x.points, 10) || 4, 1, 10), solution: String(x.solution || '') }));
+    if (!tasks.length) throw { code: 'bad_json' };
+    if (!exam || exam.sid !== sid) return;
+    exam.tasks = tasks; exam.status = 'answer';
+  } catch (e) { if (exam) { exam.status = 'error'; exam.err = aiErrorText(e); } }
+  if (exam) renderExam();
+}
+function renderExam() {
+  const o = $('#overlay'), e = exam, subj = subjectById(e.sid);
+  const prev = $('#examBody'), sc = prev ? prev.scrollTop : 0;
+  const total = e.tasks.reduce((a, t) => a + t.points, 0);
+  let body = '', foot = '';
+  if (e.status === 'loading') { body = `<div class="card"><p class="headline">Probeklausur wird erstellt …</p><p class="sub">${esc(subj ? subj.name : '')}</p>${SKEL}</div>`; foot = '<button type="button" class="btn filled" disabled>Einen Moment …</button>'; }
+  else if (e.status === 'error') { body = `<div class="card"><p class="headline">Hat nicht geklappt</p><p class="sub">${esc(e.err)}</p></div>`; foot = `<button type="button" class="btn tinted" data-act="exam-retry">Nochmal versuchen</button>`; }
+  else {
+    const got = e.results ? e.results.reduce((a, r) => a + r.points, 0) : 0;
+    if (e.results) body += `<div class="card"><p class="cap">Ergebnis</p><p class="title2">${NF0.format(got)} von ${total} Punkten · ${Math.round(got / total * 100)} %</p><p class="sub">${inlineMd(e.summary)}</p></div>`;
+    else body += `<div class="card"><p class="cap">${esc(subj ? subj.name : '')} · ${total} Punkte</p><p class="sub">Bearbeite alle Aufgaben wie in der echten Klausur, ohne Unterlagen. Danach wird alles auf einmal korrigiert.</p></div>`;
+    body += e.tasks.map((t, i) => { const r = e.results && e.results[i]; return `<div class="card q"><p class="q-num">Aufgabe ${i + 1} · ${t.points} Punkte${t.topic ? ' · ' + esc(t.topic) : ''}</p><p class="q-text">${inlineMd(t.q)}</p><label class="sr" for="ex-${i}">Antwort</label><textarea class="ans" id="ex-${i}" data-ex="${i}" rows="4" placeholder="Deine Lösung"${e.results || e.status === 'grading' ? ' readonly' : ''}>${esc(e.answers[i] || '')}</textarea>${r ? `<div class="fb ${r.points >= t.points ? 'ok' : r.points > 0 ? 'mid' : 'no'}"><strong>${NF0.format(r.points)} / ${t.points} Punkte.</strong> ${inlineMd(r.feedback)}<details><summary>Musterlösung</summary><div class="md">${md(t.solution)}</div></details></div>` : ''}</div>`; }).join('');
+    if (e.status === 'grading') foot = `<button type="button" class="btn filled" disabled>Wird korrigiert …</button>`;
+    else if (e.results) foot = `<button type="button" class="btn filled" data-act="exam-close">Fertig</button>`;
+    else foot = `${e.err ? `<p class="foot-note" style="color:var(--red)">${esc(e.err)}</p>` : ''}<button type="button" class="btn filled" data-act="exam-submit">Abgeben und korrigieren</button>`;
+  }
+  o.innerHTML = `<div class="wo-nav"><button type="button" class="nav-btn" data-act="exam-close">Schließen</button><span class="nav-title">Probeklausur</span><span></span></div><div class="wo-body" id="examBody">${body}</div><div class="wo-foot">${foot}</div>`;
+  const nb = $('#examBody'); if (nb) nb.scrollTop = sc;
+}
+async function submitExam() {
+  const e = exam; if (!e) return;
+  if (!e.tasks.some((_, i) => String(e.answers[i] || '').trim())) { toast('Bearbeite mindestens eine Aufgabe.'); return; }
+  e.status = 'grading'; e.err = ''; renderExam();
+  try {
+    const subj = subjectById(e.sid);
+    const o = await callJSON(`FACH: ${subj ? subj.name : ''}
+${e.tasks.map((t, i) => `AUFGABE ${i + 1} (${t.points} Punkte): ${t.q}\nMUSTERLÖSUNG: ${t.solution}\nANTWORT DES STUDENTEN: ${String(e.answers[i] || '').trim() || '(leer)'}`).join('\n\n')}
+
+Korrigiere wie ein fairer Prüfer an der Hochschule. Teilpunkte sind möglich (auch halbe Punkte). Leere Antworten bekommen 0 Punkte.
+Antworte nur mit JSON: {"results":[{"points":3,"feedback":"1–2 Sätze, was gut war und was gefehlt hat"}],"summary":"2–3 Sätze: Stärken und was er wiederholen sollte"}`, { maxTokens: 2200, system: SYSTEM });
+    const res = (Array.isArray(o.results) ? o.results : []);
+    e.results = e.tasks.map((t, i) => { const r = res[i] || {}; return { points: clamp(Math.round((Number(r.points) || 0) * 2) / 2, 0, t.points), feedback: String(r.feedback || '') }; });
+    e.summary = String(o.summary || '');
+    const due = startOfDay(new Date()).getTime() + DAY;
+    e.tasks.forEach((t, i) => {
+      const r = e.results[i];
+      state.stats.answers.push({ ts: Date.now(), s: e.sid, c: r.points >= t.points * 0.75 ? 1 : 0 });
+      if (r.points < t.points * 0.75) {
+        const topic = topicsOf(e.sid).find(x => x.title === t.topic);
+        state.cards.push({ id: uid(), subjectId: e.sid, topicId: topic ? topic.id : null, front: shorten(t.q, 300), back: shorten(t.solution, 500), box: 1, due, created: Date.now(), src: 'klausur' });
+      }
+    });
+    const total = e.tasks.reduce((a, t) => a + t.points, 0), got = e.results.reduce((a, r) => a + r.points, 0);
+    if (subj) subj.lastExam = { ts: Date.now(), pct: Math.round(got / total * 100) };
+    e.status = 'done'; markActive(); save();
+  } catch (err) { e.status = 'answer'; e.err = aiErrorText(err); }
+  if (exam === e) renderExam();
+}
+
+/* ================= Unterlagen ================= */
+let pdfjsP = null;
+function loadPdfJs() {
+  if (!pdfjsP) pdfjsP = new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload = () => { try { window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; res(window.pdfjsLib); } catch (e) { rej(e); } };
+    s.onerror = () => { pdfjsP = null; rej(new Error('pdfjs')); };
+    document.head.appendChild(s);
+  });
+  return pdfjsP;
+}
+async function pdfToText(file, onProgress) {
+  const lib = await loadPdfJs();
+  const doc = await lib.getDocument({ data: await file.arrayBuffer() }).promise;
+  const pages = [];
+  for (let i = 1; i <= doc.numPages; i++) {
+    const tc = await (await doc.getPage(i)).getTextContent();
+    let txt = '', line = '', lastY = null;
+    tc.items.forEach(it => { const y = it.transform ? it.transform[5] : null; if (lastY !== null && y !== null && Math.abs(y - lastY) > 2) { txt += line.trim() + '\n'; line = ''; } line += it.str + ' '; lastY = y; });
+    txt += line.trim();
+    pages.push(`[Seite ${i}]\n` + txt.replace(/[ \t]+/g, ' ').trim());
+    if (onProgress) onProgress(i, doc.numPages);
+  }
+  return { text: pages.join('\n\n'), pages: doc.numPages };
+}
+function imageToBase64(file, max) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => { const k = Math.min(1, (max || 1600) / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', 0.85).split(',')[1]); };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('img')); };
+    img.src = url;
+  });
+}
+let matCtx = null;
+function openAddMaterial(sid) {
+  matCtx = { sid, mode: 'menu' };
+  renderMatSheet();
+}
+function renderMatSheet() {
+  const m = matCtx; if (!m) return;
+  let body;
+  if (m.mode === 'menu') body = `<div class="group">
+      <button type="button" class="row" data-act="mat-pick" data-kind="pdf"><span class="row-main"><span class="row-title">PDF auswählen</span><span class="row-sub">Folien, Skripte, Übungsblätter</span></span>${ICON.chev}</button>
+      <button type="button" class="row" data-act="mat-pick" data-kind="foto"><span class="row-main"><span class="row-title">Fotos auswählen</span><span class="row-sub">Mitschriften, Tafelbilder, Buchseiten</span></span>${ICON.chev}</button>
+      <button type="button" class="row" data-act="mat-text"><span class="row-main"><span class="row-title">Text einfügen</span><span class="row-sub">Aus Notizen oder einer anderen App kopiert</span></span>${ICON.chev}</button>
+    </div>
+    <p class="foot">Lade am besten pro Vorlesung eine Unterlage hoch. Daraus erstellt die KI die Lernthemen. Bei eingescannten PDFs ohne Text nimm lieber Fotos.</p>
+    <input type="file" id="matPdf" accept="application/pdf,.pdf" hidden>
+    <input type="file" id="matFoto" accept="image/*" multiple hidden>`;
+  else if (m.mode === 'text') body = `<div class="group"><label class="frow"><span class="flabel">Name</span><input class="finput" id="matName" type="text" placeholder="z. B. Vorlesung 3" maxlength="60" autocomplete="off"></label></div>
+    <p class="cap pad">Text</p><div class="group"><label class="sr" for="matText">Text</label><textarea class="fta" id="matText" placeholder="Hier einfügen …"></textarea></div>
+    <p class="foot"></p><button type="button" class="btn filled" data-act="mat-save-text">Speichern und Themen erstellen</button>`;
+  else body = `<div class="card"><p class="headline">${esc(m.title || 'Wird verarbeitet …')}</p><p class="sub">${esc(m.info || '')}</p>${m.error ? '' : SKEL}${m.error ? `<p class="sub" style="color:var(--red)">${esc(m.error)}</p>` : ''}</div>${m.error ? '<p class="foot"></p><button type="button" class="btn tinted" data-act="sheet-close">Schließen</button>' : ''}`;
+  openSheet(sheetNav('Unterlagen hinzufügen', m.mode === 'work' && !m.error ? '' : '<button type="button" class="nav-btn" data-act="sheet-close">Abbrechen</button>', '') + `<div class="sheet-body">${body}</div>`);
+}
+async function addMaterial(sid, name, kind, text, pages) {
+  const subj = subjectById(sid); if (!subj) return null;
+  const mat = { id: uid(), name: shorten(name, 80) || 'Unterlage', kind, chars: text.length, pages: pages || 0, added: Date.now(), processed: false };
+  await IDB.set('mat:' + mat.id, text);
+  subj.materials.push(mat); save();
+  return mat;
+}
+async function processPdf(file) {
+  const m = matCtx; m.mode = 'work'; m.title = 'PDF wird gelesen …'; m.info = file.name; renderMatSheet();
+  try {
+    const r = await pdfToText(file, (i, n) => { if (matCtx === m) { m.info = `${file.name} · Seite ${i} von ${n}`; const p = $('.sheet .sub'); if (p) p.textContent = m.info; } });
+    if (r.text.replace(/\[Seite \d+\]/g, '').trim().length < r.pages * 40) throw new Error('scan');
+    const mat = await addMaterial(m.sid, file.name.replace(/\.pdf$/i, ''), 'pdf', r.text, r.pages);
+    await generateTopics(m.sid, mat);
+  } catch (e) {
+    m.error = e && e.message === 'scan' ? 'In dieser PDF ist kaum Text, wahrscheinlich ist sie eingescannt. Mach stattdessen Fotos von den Seiten.' : e && e.message === 'pdfjs' ? 'Der PDF-Leser konnte nicht geladen werden. Prüf deine Internetverbindung.' : e && e.code ? aiErrorText(e) : 'Die PDF konnte nicht gelesen werden.';
+    if (matCtx === m) renderMatSheet();
+    render(true);
+  }
+}
+async function processFotos(files) {
+  const m = matCtx; m.mode = 'work'; m.title = 'Fotos werden gelesen …'; renderMatSheet();
+  try {
+    const parts = [];
+    for (let i = 0; i < files.length; i++) {
+      m.info = `Foto ${i + 1} von ${files.length}`; if (matCtx === m) { const p = $('.sheet .sub'); if (p) p.textContent = m.info; }
+      const data = await imageToBase64(files[i], 1600);
+      const txt = await callAI([{ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data } }, { type: 'text', text: 'Schreib den gesamten Lerninhalt auf diesem Bild vollständig ab (Mitschrift, Folie, Tafel oder Buchseite). Formeln als lesbarer Text mit Unicode. Grafiken oder Tabellen beschreibst du kurz in [eckigen Klammern]. Antworte nur mit dem abgeschriebenen Inhalt.' }], { maxTokens: 3000 });
+      parts.push(`[Foto ${i + 1}]\n${txt.trim()}`);
+    }
+    const mat = await addMaterial(m.sid, `Fotos vom ${shortDate(Date.now())}`, 'foto', parts.join('\n\n'), files.length);
+    await generateTopics(m.sid, mat);
+  } catch (e) { m.error = e && e.code ? aiErrorText(e) : 'Die Fotos konnten nicht gelesen werden.'; if (matCtx === m) renderMatSheet(); render(true); }
+}
+async function generateTopics(sid, mat, silent) {
+  const subj = subjectById(sid); if (!subj || !mat) return;
+  const m = matCtx;
+  if (!silent && m) { m.mode = 'work'; m.title = 'KI erstellt deine Lernthemen …'; m.info = mat.name; m.error = ''; renderMatSheet(); }
+  const text = await IDB.get('mat:' + mat.id) || '';
+  const existing = topicsOf(sid).map(t => t.title);
+  const o = await callJSON(`${learnerProfile(sid)}
+
+FACH: ${subj.name}
+UNTERLAGE „${mat.name}“:
+"""
+${text.slice(0, 90000)}
+"""
+
+AUFGABE: Teile den Stoff dieser Unterlage in Lernthemen auf (je nach Umfang 2–12), in sinnvoller Reihenfolge vom Grundlegenden zum Fortgeschrittenen. Lass Organisatorisches (Termine, Literatur, Klausurregeln) weg.
+Für jedes Thema:
+- title: höchstens 6 Wörter
+- goal: 1 Satz, was man danach kann
+- keywords: 3–6 Schlüsselbegriffe, wie sie im Text stehen
+- notes: das Wichtigste aus der Unterlage zu diesem Thema (Definitionen, Formeln, Beispiele), 60–180 Wörter, nur was in der Unterlage steht
+${existing.length ? 'Diese Themen gibt es schon, leg sie nicht doppelt an: ' + existing.join('; ') : ''}
+Antworte nur mit JSON: {"topics":[{"title":"...","goal":"...","keywords":["..."],"notes":"..."}]}`, { maxTokens: 8000, system: SYSTEM });
+  const list = (Array.isArray(o.topics) ? o.topics : []).filter(x => x && x.title).slice(0, 15);
+  if (!list.length) throw { code: 'bad_json' };
+  const have = new Set(existing.map(x => x.toLowerCase()));
+  let n = 0;
+  list.forEach(x => {
+    const title = shorten(String(x.title), 70); if (have.has(title.toLowerCase())) return; have.add(title.toLowerCase());
+    const t = { id: uid(), subjectId: sid, title, goal: shorten(String(x.goal || ''), 200), keywords: (Array.isArray(x.keywords) ? x.keywords : []).map(String).slice(0, 8), notes: String(x.notes || '').slice(0, 1600), status: 'neu', mastery: 0, session: null, sheet: '', created: Date.now(), source: mat.id };
+    state.topics[t.id] = t; subj.topics.push(t.id); n++;
+  });
+  mat.processed = true; save();
+  if (!silent) { closeSheet(); matCtx = null; ui.tab = 'subjects'; ui.subjectId = sid; render(); toast(n ? `${n} neue Themen erstellt` : 'Keine neuen Themen gefunden'); }
+  return n;
+}
+
+/* ================= Ansichten ================= */
+function navbar(title, left, right) { return `<div class="navbar" id="navbar">${left || '<span></span>'}<span class="nav-title">${esc(title)}</span><span style="justify-self:end">${right || ''}</span></div>`; }
+function viewToday() {
+  const p = state.profile, due = dueCards().length, st = streak(), acc = accuracy();
+  let cont = null;
+  if (state.last && state.topics[state.last.topicId] && state.topics[state.last.topicId].session) cont = state.topics[state.last.topicId];
+  if (!cont) { for (const s of state.subjects) { const t = nextTopic(s.id); if (t) { cont = t; break; } } }
+  const contSubj = cont ? subjectById(cont.subjectId) : null;
+  return navbar('Heute') + `
+  <header class="lt"><div class="lt-row"><div><p class="lt-date">${esc(longDate(new Date()))}</p><h1>${p.name ? 'Hey ' + esc(p.name) : 'Lernen'}</h1></div><button type="button" class="avatar-btn" data-act="settings" aria-label="Einstellungen">${esc(initial(p.name || 'L'))}</button></div></header>
+  <div class="content">
+    ${!getKey() ? `<button type="button" class="card warn-card" data-act="settings" style="border:0;text-align:left;width:100%;font:inherit;color:inherit"><span class="headline">KI-Schlüssel fehlt</span><span class="sub">Ohne Schlüssel kann die App nichts erklären. Tipp hier, um ihn einzutragen.</span></button>` : ''}
+    <div class="stats3">
+      <div class="stat"><span class="stat-num">${st}</span><span class="stat-lbl">${st === 1 ? 'Tag' : 'Tage'} in Folge</span></div>
+      <div class="stat"><span class="stat-num">${acc.n ? Math.round(acc.rate * 100) + '%' : '–'}</span><span class="stat-lbl">Trefferquote</span></div>
+      <div class="stat"><span class="stat-num">${due}</span><span class="stat-lbl">Karten fällig</span></div>
+    </div>
+    ${due ? `<div class="card"><p class="cap">Wiederholung</p><p class="title3">${due} ${due === 1 ? 'Karteikarte ist' : 'Karteikarten sind'} fällig</p><p class="sub">Ein paar Minuten reichen. Was du schon weißt, kommt erst später wieder.</p><button type="button" class="btn filled" data-act="review">Wiederholen</button></div>` : ''}
+    ${cont ? `<div class="card"><p class="cap">${esc(contSubj ? contSubj.name : '')} · ${cont.session ? 'Weiterlernen' : 'Als Nächstes'}</p><p class="title2">${esc(cont.title)}</p>${cont.goal ? `<p class="sub">${esc(cont.goal)}</p>` : ''}${cont.session ? `<div class="bar"><span style="width:${((cont.session.stage - 1) / 4) * 100}%"></span></div><p class="sub">${esc(topicStatus(cont).text)}</p>` : ''}<button type="button" class="btn ${due ? 'tinted' : 'filled'}" data-act="learn" data-id="${cont.id}">${cont.session ? 'Fortsetzen' : 'Lernsession starten'}</button></div>` : ''}
+    ${state.subjects.length ? `<h2 class="sec-title">Deine Fächer</h2><div class="group">${state.subjects.map(s => { const n = s.topics.length, l = learnedCount(s.id); return `<button type="button" class="row" data-act="open-subject" data-id="${s.id}"><span class="row-main"><span class="row-title">${esc(s.name)}</span><span class="row-sub">${n ? `${l} von ${n} Themen gelernt` : 'Noch keine Themen'}</span></span>${ICON.chev}</button>`; }).join('')}</div>`
+      : `<div class="card empty">${ICON.book}<p class="title3">Leg dein erstes Fach an</p><p class="sub">Zum Beispiel Statistik oder BWL. Danach lädst du deine Unterlagen hoch, und die KI macht daraus Lernsessions.</p><button type="button" class="btn filled" data-act="add-subject">Fach anlegen</button></div>`}
+  </div>`;
+}
+function viewSubjects() {
+  if (ui.subjectId && subjectById(ui.subjectId)) return viewSubject(subjectById(ui.subjectId));
+  ui.subjectId = null;
+  return navbar('Fächer', '', `<button type="button" class="nav-btn end" data-act="add-subject" aria-label="Fach hinzufügen">${ICON.plusNav}</button>`) + `
+  <header class="lt"><div class="lt-row"><h1>Fächer</h1></div></header>
+  <div class="content">${state.subjects.length ? `<div class="group">${state.subjects.map(s => { const n = s.topics.length, l = learnedCount(s.id), d = dueCards(s.id).length; return `<button type="button" class="row" data-act="open-subject" data-id="${s.id}"><span class="row-main"><span class="row-title">${esc(s.name)}</span><span class="row-sub">${n ? `${l} von ${n} gelernt` : 'Noch keine Themen'}${d ? ` · ${d} Karten fällig` : ''}</span>${n ? `<span class="bar" style="margin-top:6px"><span style="width:${Math.round(l / n * 100)}%"></span></span>` : ''}</span>${ICON.chev}</button>`; }).join('')}
+    <button type="button" class="row add" data-act="add-subject">${ICON.plus}<span>Fach hinzufügen</span></button></div>`
+    : `<div class="card empty">${ICON.book}<p class="title3">Noch keine Fächer</p><p class="sub">Leg ein Fach an und lade deine Unterlagen hoch.</p><button type="button" class="btn filled" data-act="add-subject">Fach anlegen</button></div>`}</div>`;
+}
+function viewSubject(s) {
+  const ts = topicsOf(s.id), l = learnedCount(s.id), d = dueCards(s.id).length, nt = nextTopic(s.id), unprocessed = s.materials.filter(m => !m.processed);
+  return navbar(s.name, `<button type="button" class="nav-btn" data-act="back-subjects">${ICON.back}Fächer</button>`) + `
+  <header class="lt"><h1>${esc(s.name)}</h1><p class="lt-sub">${ts.length} Themen · ${l} gelernt${d ? ` · ${d} Karten fällig` : ''}${s.lastExam ? ` · Probeklausur ${s.lastExam.pct} %` : ''}</p></header>
+  <div class="content">
+    ${ts.length ? `<div class="btn-row">${nt ? `<button type="button" class="btn filled" data-act="learn" data-id="${nt.id}">${nt.session ? 'Weiterlernen' : 'Lernen'}</button>` : `<button type="button" class="btn filled" data-act="review-subject" data-id="${s.id}"${d ? '' : ' disabled'}>Wiederholen</button>`}<button type="button" class="btn tinted" data-act="exam" data-id="${s.id}">Probeklausur</button></div>` : ''}
+    ${!ts.length && !s.materials.length ? `<div class="card"><p class="headline">So geht’s</p><p class="sub">1. Lade deine Unterlagen hoch: PDF, Fotos oder Text.<br>2. Die KI macht daraus Lernthemen.<br>3. Pro Thema gibt es eine Lernsession: einfach erklärt, genauer, Aufgaben, eigene Worte. Erst wenn es sitzt, geht es weiter.</p><button type="button" class="btn filled" data-act="add-material" data-id="${s.id}">Unterlagen hinzufügen</button></div>` : ''}
+    ${ts.length ? `<h2 class="sec-title">Themen</h2><div class="group">${ts.map((t, i) => { const st = topicStatus(t); return `<button type="button" class="row" data-act="topic" data-id="${t.id}"><span class="num-dot ${st.cls}">${t.status === 'gelernt' && !t.session ? ICON.check : i + 1}</span><span class="row-main"><span class="row-title">${esc(t.title)}</span><span class="row-sub">${esc(st.text)}</span></span>${ICON.chev}</button>`; }).join('')}
+      <button type="button" class="row add" data-act="add-topic" data-id="${s.id}">${ICON.plus}<span>Thema selbst hinzufügen</span></button></div>` : (s.materials.length ? '' : `<div class="group"><button type="button" class="row add" data-act="add-topic" data-id="${s.id}">${ICON.plus}<span>Thema ohne Unterlagen hinzufügen</span></button></div>`)}
+    ${s.materials.length ? `<h2 class="sec-title">Unterlagen</h2><div class="group">${s.materials.map(m => `<button type="button" class="row" data-act="material" data-sid="${s.id}" data-id="${m.id}"><span class="row-main"><span class="row-title">${esc(m.name)}</span><span class="row-sub">${m.kind === 'pdf' ? `PDF · ${m.pages} Seiten` : m.kind === 'foto' ? `${m.pages} ${m.pages === 1 ? 'Foto' : 'Fotos'}` : 'Text'} · ${NF0.format(m.chars)} Zeichen</span></span>${m.processed ? '' : '<span class="badge orange">Ohne Themen</span>'}${ICON.chev}</button>`).join('')}
+      <button type="button" class="row add" data-act="add-material" data-id="${s.id}">${ICON.plus}<span>Unterlagen hinzufügen</span></button></div>
+      ${unprocessed.length ? `<button type="button" class="btn tinted" data-act="gen-all" data-id="${s.id}">Themen aus ${unprocessed.length} ${unprocessed.length === 1 ? 'Unterlage' : 'Unterlagen'} erstellen</button>` : ''}` : ''}
+    <p class="cap pad"></p>
+    <div class="group"><button type="button" class="row tint" data-act="rename-subject" data-id="${s.id}">Fach umbenennen</button><button type="button" class="row destructive" data-act="del-subject" data-id="${s.id}">Fach löschen</button></div>
+  </div>`;
+}
+function viewCards() {
+  const due = dueCards(), boxes = [1, 2, 3, 4, 5].map(b => state.cards.filter(c => c.box === b).length), max = Math.max(1, ...boxes);
+  return navbar('Karteikarten') + `
+  <header class="lt"><h1>Karteikarten</h1><p class="lt-sub">${state.cards.length} Karten insgesamt</p></header>
+  <div class="content">
+    ${state.cards.length ? `<div class="card"><p class="cap">Heute</p><p class="title2">${due.length ? `${due.length} fällig` : 'Alles erledigt'}</p><p class="sub">${due.length ? 'Weißt du eine Karte, kommt sie erst nach ein paar Tagen wieder. Weißt du sie nicht, kommt sie sofort nochmal.' : 'Morgen kommen wieder welche. Lern solange ein neues Thema.'}</p><button type="button" class="btn filled" data-act="review"${due.length ? '' : ' disabled'}>Wiederholen</button></div>
+      <h2 class="sec-title">Fortschritt</h2>
+      <div class="card"><div class="boxes">${boxes.map((n, i) => `<div><span class="num" style="font-weight:600;color:var(--label)">${n}</span><b style="height:${Math.round(n / max * 60)}px;opacity:${0.35 + i * 0.16}"></b><span>${['Neu', '1 Tag', '3 Tage', '1 Woche', 'Sitzt'][i]}</span></div>`).join('')}</div><p class="sub">Je weiter rechts, desto sicherer sitzt die Karte.</p></div>
+      <h2 class="sec-title">Nach Fach</h2>
+      <div class="group">${state.subjects.filter(s => state.cards.some(c => c.subjectId === s.id)).map(s => { const d = dueCards(s.id).length, n = state.cards.filter(c => c.subjectId === s.id).length; return `<button type="button" class="row" data-act="review-subject" data-id="${s.id}"${d ? '' : ' disabled'}><span class="row-main"><span class="row-title">${esc(s.name)}</span><span class="row-sub">${d} fällig · ${n} gesamt</span></span>${d ? ICON.chev : ''}</button>`; }).join('')}</div>`
+    : `<div class="card empty">${ICON.cards}<p class="title3">Noch keine Karten</p><p class="sub">Nach jeder Lernsession landen die wichtigsten Punkte und deine Fehler hier. So wiederholst du genau das, was noch nicht sitzt.</p></div>`}
+  </div>`;
+}
+function render(keep) {
+  const main = $('#main'), st = keep ? main.scrollTop : 0;
+  document.querySelectorAll('.tab').forEach(b => { if (b.dataset.tab === ui.tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  main.innerHTML = ui.tab === 'subjects' ? viewSubjects() : ui.tab === 'cards' ? viewCards() : viewToday();
+  main.scrollTop = st; onScroll();
+  const d = dueCards().length, bd = $('#cardBadge'); bd.hidden = !d; bd.textContent = d > 99 ? '99+' : d;
+}
+function onScroll() { const nb = $('#navbar'); if (nb) nb.classList.toggle('scrolled', $('#main').scrollTop > 40); }
+const ui = { tab: 'today', subjectId: null };
+
+/* ================= Sheets ================= */
+let lastFocus = null;
+function openSheet(html, actionStyle) {
+  const w = $('#sheetWrap'), s = $('#sheet');
+  if (w.hidden) lastFocus = document.activeElement;
+  s.className = 'sheet' + (actionStyle ? ' as' : '');
+  s.innerHTML = html; w.hidden = false;
+  try { s.focus({ preventScroll: true }); } catch (e) { /* egal */ }
+}
+function closeSheet() {
+  const w = $('#sheetWrap'); if (w.hidden) return;
+  w.hidden = true; $('#sheet').innerHTML = '';
+  if (lastFocus && document.contains(lastFocus)) { try { lastFocus.focus({ preventScroll: true }); } catch (e) { /* egal */ } }
+}
+function sheetNav(title, left, right) { return `<div class="sheet-nav">${left || '<span></span>'}<span class="nav-title">${esc(title)}</span>${right || '<span></span>'}</div>`; }
+function confirmSheet(o) {
+  openSheet(`<div class="as-group"><div class="as-head"><p class="as-title">${esc(o.title)}</p>${o.text ? `<p class="as-text">${esc(o.text)}</p>` : ''}</div><button type="button" class="as-btn destructive" data-act="${o.act}"${o.id ? ` data-id="${esc(o.id)}"` : ''}>${esc(o.confirm)}</button></div><div class="as-group"><button type="button" class="as-btn strong" data-act="sheet-close">Abbrechen</button></div>`, true);
+}
+function seg(name, opts, cur) { return `<div class="seg" role="group">${opts.map(o => `<button type="button" data-act="seg" data-name="${name}" data-val="${o[0]}" aria-pressed="${cur === o[0]}">${o[1]}</button>`).join('')}</div>`; }
+let draft = null;
+function openSettings() {
+  const p = state.profile, welcome = !p.onboarded;
+  draft = { style: p.style || 'einfach', quality: p.quality || 'schnell' };
+  openSheet(sheetNav(welcome ? 'Willkommen' : 'Einstellungen', '', `<button type="button" class="nav-btn strong end" data-act="settings-save">${welcome ? 'Los geht’s' : 'Fertig'}</button>`) + `<div class="sheet-body">
+    ${welcome ? '<div class="card"><p class="title3">Lernen, bis es wirklich sitzt</p><p class="sub">Jedes Thema lernst du in 4 Stufen: einfach erklärt, genauer, selbst anwenden, in eigenen Worten. Weiter geht es erst, wenn du es kannst. Was noch hakt, kommt als Karteikarte zurück.</p></div>' : ''}
+    <p class="cap pad">Über dich</p>
+    <div class="group">
+      <label class="frow"><span class="flabel">Name</span><input class="finput" id="stName" type="text" value="${esc(p.name)}" placeholder="Dein Vorname" maxlength="30" autocomplete="off"></label>
+      <label class="frow"><span class="flabel">Studium</span><input class="finput" id="stProgram" type="text" value="${esc(p.program)}" placeholder="z. B. BWL" maxlength="80" autocomplete="off"></label>
+    </div>
+    <p class="cap pad">So soll erklärt werden</p>
+    ${seg('style', [['einfach', 'Einfache Beispiele'], ['kurz', 'Kurz & knapp'], ['ausfuehrlich', 'Ausführlich']], draft.style)}
+    <p class="cap pad">KI</p>
+    <div class="group"><label class="frow"><span class="flabel">KI-Schlüssel</span><input class="finput" id="stKey" type="password" value="${esc(getKey())}" placeholder="sk-ant-…" autocomplete="off" autocapitalize="off" spellcheck="false"></label></div>
+    <p class="foot">Den Schlüssel bekommst du auf console.anthropic.com unter „API Keys“. Er bleibt nur auf diesem Gerät gespeichert. Hast du ihn schon in der Trainings-App eingetragen, wird er hier automatisch übernommen, falls dein iPhone das zulässt.</p>
+    <p class="cap pad">Qualität</p>
+    ${seg('quality', [['schnell', 'Schnell & günstig'], ['gruendlich', 'Gründlicher']], draft.quality)}
+    <p class="foot">„Gründlicher“ nutzt ein stärkeres Modell. Es erklärt etwas besser, kostet aber ungefähr dreimal so viel und ist langsamer.</p>
+    ${welcome ? '' : `<p class="cap pad">Backup</p>
+    <div class="group"><button type="button" class="row tint" data-act="export">Backup sichern</button><button type="button" class="row tint" data-act="import">Backup laden</button></div>
+    <p class="foot">Sichere ab und zu ein Backup in der Dateien-App. Deine Unterlagen sind darin enthalten.</p>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+    <p class="cap pad"></p>
+    <div class="group"><button type="button" class="row destructive" data-act="wipe">Alles löschen</button></div>`}
+  </div>`);
+}
+function saveSettings() {
+  const p = state.profile;
+  p.name = ($('#stName').value || '').trim().slice(0, 30);
+  p.program = ($('#stProgram').value || '').trim().slice(0, 80);
+  p.style = draft.style; p.quality = draft.quality; p.onboarded = true;
+  const k = ($('#stKey').value || '').trim();
+  if (k !== getKey()) setKey(k);
+  save(); closeSheet(); render(true);
+}
+function openNameSheet(o) {
+  openSheet(sheetNav(o.title, '<button type="button" class="nav-btn" data-act="sheet-close">Abbrechen</button>', `<button type="button" class="nav-btn strong end" data-act="${o.act}"${o.id ? ` data-id="${esc(o.id)}"` : ''}>Sichern</button>`) + `<div class="sheet-body">
+    <div class="group"><label class="frow"><span class="flabel">${esc(o.label)}</span><input class="finput" id="nameInput" type="text" value="${esc(o.value || '')}" placeholder="${esc(o.placeholder || '')}" maxlength="70" autocomplete="off"></label>${o.notes ? `<label class="sr" for="notesInput">Notizen</label><textarea class="fta" id="notesInput" placeholder="${esc(o.notes)}" style="min-height:110px"></textarea>` : ''}</div>
+    ${o.foot ? `<p class="foot">${esc(o.foot)}</p>` : ''}</div>`);
+  setTimeout(() => { const i = $('#nameInput'); if (i) i.focus(); }, 250);
+}
+function openTopic(id) {
+  const t = state.topics[id]; if (!t) return;
+  const st = topicStatus(t);
+  openSheet(sheetNav(t.title, '', '<button type="button" class="nav-btn strong end" data-act="sheet-close">Fertig</button>') + `<div class="sheet-body">
+    <div class="card"><span class="badge ${st.badge}" style="align-self:flex-start">${esc(st.text)}</span>${t.goal ? `<p class="sub">${esc(t.goal)}</p>` : ''}
+      <button type="button" class="btn filled" data-act="learn" data-id="${t.id}">${t.session ? 'Lernsession fortsetzen' : t.status === 'neu' ? 'Lernsession starten' : 'Nochmal lernen'}</button></div>
+    <div class="group" style="margin-top:12px">
+      ${t.sheet ? `<button type="button" class="row" data-act="sheet-view" data-id="${t.id}"><span class="row-main"><span class="row-title">Lernzettel ansehen</span></span>${ICON.chev}</button>` : ''}
+      ${t.session ? `<button type="button" class="row" data-act="restart" data-id="${t.id}"><span class="row-main"><span class="row-title">Session neu beginnen</span></span>${ICON.chev}</button>` : ''}
+      <button type="button" class="row" data-act="rename-topic" data-id="${t.id}"><span class="row-main"><span class="row-title">Umbenennen</span></span>${ICON.chev}</button>
+    </div>
+    ${t.notes ? `<p class="cap pad">Kerninhalte aus deinen Unterlagen</p><div class="card"><div class="md" style="font-size:15px">${md(t.notes)}</div></div>` : ''}
+    <p class="cap pad"></p><div class="group"><button type="button" class="row destructive" data-act="del-topic" data-id="${t.id}">Thema löschen</button></div>
+  </div>`);
+}
+function openSheetView(id) {
+  const t = state.topics[id]; if (!t) return;
+  openSheet(sheetNav('Lernzettel', '', '<button type="button" class="nav-btn strong end" data-act="sheet-close">Fertig</button>') + `<div class="sheet-body"><p class="cap pad" style="padding-left:0">${esc(t.title)}</p><div class="card"><div class="md">${md(t.sheet)}</div></div><p class="foot"></p><div class="btn-row"><button type="button" class="btn tinted" data-act="copy-sheet" data-id="${t.id}">Kopieren</button><button type="button" class="btn tinted" data-act="share-sheet" data-id="${t.id}">Teilen</button></div></div>`);
+}
+function openMaterial(sid, mid) {
+  const s = subjectById(sid), m = s && s.materials.find(x => x.id === mid); if (!m) return;
+  const n = topicsOf(sid).filter(t => t.source === mid).length;
+  openSheet(sheetNav(m.name, '', '<button type="button" class="nav-btn strong end" data-act="sheet-close">Fertig</button>') + `<div class="sheet-body">
+    <div class="card"><p class="sub">${m.kind === 'pdf' ? `PDF · ${m.pages} Seiten` : m.kind === 'foto' ? `${m.pages} Fotos` : 'Text'} · ${NF0.format(m.chars)} Zeichen · hinzugefügt am ${shortDate(m.added)}</p><p class="sub">${n ? `${n} Themen stammen aus dieser Unterlage.` : 'Aus dieser Unterlage gibt es noch keine Themen.'}</p>
+    <button type="button" class="btn tinted" data-act="gen-one" data-sid="${sid}" data-id="${mid}">${n ? 'Weitere Themen suchen' : 'Themen erstellen'}</button></div>
+    <p class="cap pad"></p><div class="group"><button type="button" class="row destructive" data-act="del-material" data-sid="${sid}" data-id="${mid}">Unterlage löschen</button></div>
+    <p class="foot">Beim Löschen bleiben die Themen erhalten.</p>
+  </div>`);
+}
+
+/* ================= Aktionen ================= */
+async function exportBackup() {
+  const mats = {};
+  for (const s of state.subjects) for (const m of s.materials) { mats[m.id] = await IDB.get('mat:' + m.id) || ''; }
+  const blob = new Blob([JSON.stringify({ app: 'lernen', v: 1, state, materials: mats })], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'lernen-backup-' + dayKey(Date.now()) + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function importBackup(file) {
+  const r = new FileReader();
+  r.onload = async () => {
+    try {
+      const o = JSON.parse(r.result);
+      if (!o || o.app !== 'lernen' || !valid(o.state)) throw new Error('ungültig');
+      for (const id of Object.keys(o.materials || {})) await IDB.set('mat:' + id, o.materials[id]);
+      state = o.state; save(); closeSheet(); ui.tab = 'today'; ui.subjectId = null; render(); toast('Backup geladen');
+    } catch (e) { toast('Das ist keine gültige Backup-Datei.'); }
+  };
+  r.readAsText(file);
+}
+async function deleteSubject(id) {
+  const s = subjectById(id); if (!s) return;
+  for (const m of s.materials) await IDB.del('mat:' + m.id);
+  s.topics.forEach(tid => { delete state.topics[tid]; });
+  state.cards = state.cards.filter(c => c.subjectId !== id);
+  state.subjects = state.subjects.filter(x => x.id !== id);
+  if (state.last && !state.topics[state.last.topicId]) state.last = null;
+  save(); closeSheet(); ui.subjectId = null; render(); toast('Fach gelöscht');
+}
+function shareSheet(t, mode) {
+  const text = `${t.title}\n\n${t.sheet}`;
+  if (mode === 'share' && navigator.share) { navigator.share({ title: t.title, text }).catch(() => {}); return; }
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => toast('Lernzettel kopiert'), () => toast('Kopieren hat nicht geklappt'));
+}
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-act],[data-tab]');
+  if (!t || t.disabled) return;
+  if (t.dataset.tab) { closeSheet(); if (ui.tab === t.dataset.tab && t.dataset.tab === 'subjects') ui.subjectId = null; ui.tab = t.dataset.tab; render(); return; }
+  const a = t.dataset.act, id = t.dataset.id;
+  switch (a) {
+    case 'settings': openSettings(); break;
+    case 'seg': if (draft) { draft[t.dataset.name] = t.dataset.val; t.parentNode.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b === t))); } break;
+    case 'settings-save': saveSettings(); break;
+    case 'export': exportBackup(); break;
+    case 'import': { const f = $('#importFile'); if (f) f.click(); break; }
+    case 'wipe': confirmSheet({ title: 'Wirklich alles löschen?', text: 'Fächer, Unterlagen, Themen, Karten und Statistik werden gelöscht. Mach vorher ein Backup.', confirm: 'Alles löschen', act: 'wipe-yes' }); break;
+    case 'wipe-yes': (async () => { const keys = await IDB.keys(); for (const k of keys) await IDB.del(k); const prof = state.profile; state = freshState(); state.profile = prof; save(); closeSheet(); ui.tab = 'today'; ui.subjectId = null; render(); toast('Alles gelöscht'); })(); break;
+    case 'add-subject': openNameSheet({ title: 'Neues Fach', label: 'Name', placeholder: 'z. B. Statistik', act: 'add-subject-save', foot: 'Danach lädst du die Unterlagen für dieses Fach hoch.' }); break;
+    case 'add-subject-save': { const n = ($('#nameInput').value || '').trim(); if (!n) { toast('Gib dem Fach einen Namen.'); break; } const s = { id: uid(), name: n.slice(0, 60), created: Date.now(), materials: [], topics: [] }; state.subjects.push(s); save(); closeSheet(); ui.tab = 'subjects'; ui.subjectId = s.id; render(); break; }
+    case 'open-subject': ui.tab = 'subjects'; ui.subjectId = id; render(); break;
+    case 'back-subjects': ui.subjectId = null; render(); break;
+    case 'rename-subject': { const s = subjectById(id); if (s) openNameSheet({ title: 'Fach umbenennen', label: 'Name', value: s.name, act: 'rename-subject-save', id }); break; }
+    case 'rename-subject-save': { const s = subjectById(id), n = ($('#nameInput').value || '').trim(); if (s && n) { s.name = n.slice(0, 60); save(); } closeSheet(); render(true); break; }
+    case 'del-subject': confirmSheet({ title: 'Fach löschen?', text: 'Alle Themen, Unterlagen und Karteikarten dieses Fachs werden gelöscht.', confirm: 'Fach löschen', act: 'del-subject-yes', id }); break;
+    case 'del-subject-yes': deleteSubject(id); break;
+    case 'add-material': openAddMaterial(id); break;
+    case 'mat-pick': { const f = $(t.dataset.kind === 'pdf' ? '#matPdf' : '#matFoto'); if (f) f.click(); break; }
+    case 'mat-text': if (matCtx) { matCtx.mode = 'text'; renderMatSheet(); } break;
+    case 'mat-save-text': (async () => {
+      const txt = ($('#matText').value || '').trim(), name = ($('#matName').value || '').trim() || `Text vom ${shortDate(Date.now())}`;
+      if (txt.length < 80) { toast('Füg etwas mehr Text ein.'); return; }
+      const m = matCtx; const mat = await addMaterial(m.sid, name, 'text', txt, 0);
+      try { await generateTopics(m.sid, mat); } catch (err) { m.mode = 'work'; m.error = aiErrorText(err); renderMatSheet(); render(true); }
+    })(); break;
+    case 'material': openMaterial(t.dataset.sid, id); break;
+    case 'gen-one': (async () => { const s = subjectById(t.dataset.sid), m = s && s.materials.find(x => x.id === id); if (!m) return; matCtx = { sid: s.id, mode: 'work' }; try { await generateTopics(s.id, m); } catch (err) { matCtx.error = aiErrorText(err); renderMatSheet(); } })(); break;
+    case 'gen-all': (async () => {
+      const s = subjectById(id); if (!s) return;
+      const list = s.materials.filter(m => !m.processed); let total = 0;
+      matCtx = { sid: s.id, mode: 'work', title: 'KI erstellt deine Lernthemen …' };
+      try { for (let i = 0; i < list.length; i++) { matCtx.info = `${list[i].name} (${i + 1} von ${list.length})`; renderMatSheet(); total += await generateTopics(s.id, list[i], true) || 0; } closeSheet(); matCtx = null; render(true); toast(`${total} neue Themen erstellt`); }
+      catch (err) { matCtx.error = aiErrorText(err); renderMatSheet(); render(true); }
+    })(); break;
+    case 'del-material': confirmSheet({ title: 'Unterlage löschen?', text: 'Die Themen daraus bleiben erhalten.', confirm: 'Löschen', act: 'del-material-yes', id: t.dataset.sid + '|' + id }); break;
+    case 'del-material-yes': { const parts = String(id).split('|'), s = subjectById(parts[0]); if (s) { s.materials = s.materials.filter(m => m.id !== parts[1]); IDB.del('mat:' + parts[1]); save(); } closeSheet(); render(true); break; }
+    case 'add-topic': openNameSheet({ title: 'Neues Thema', label: 'Thema', placeholder: 'z. B. Standardabweichung', act: 'add-topic-save', id, notes: 'Optional: Was gehört dazu? Stichpunkte aus der Vorlesung …', foot: 'Ohne Unterlagen erklärt die KI das Thema mit Lehrbuchwissen.' }); break;
+    case 'add-topic-save': { const s = subjectById(id), n = ($('#nameInput').value || '').trim(); if (!s || !n) { toast('Gib dem Thema einen Namen.'); break; } const notesEl = $('#notesInput'); const tp = { id: uid(), subjectId: s.id, title: n.slice(0, 70), goal: '', keywords: n.split(/\s+/).slice(0, 5), notes: notesEl ? notesEl.value.trim().slice(0, 1600) : '', status: 'neu', mastery: 0, session: null, sheet: '', created: Date.now(), source: null }; state.topics[tp.id] = tp; s.topics.push(tp.id); save(); closeSheet(); render(true); break; }
+    case 'topic': openTopic(id); break;
+    case 'rename-topic': { const tp = state.topics[id]; if (tp) openNameSheet({ title: 'Thema umbenennen', label: 'Thema', value: tp.title, act: 'rename-topic-save', id }); break; }
+    case 'rename-topic-save': { const tp = state.topics[id], n = ($('#nameInput').value || '').trim(); if (tp && n) { tp.title = n.slice(0, 70); save(); } closeSheet(); render(true); break; }
+    case 'del-topic': confirmSheet({ title: 'Thema löschen?', text: 'Auch die Karteikarten dazu werden gelöscht.', confirm: 'Thema löschen', act: 'del-topic-yes', id }); break;
+    case 'del-topic-yes': { const tp = state.topics[id]; if (tp) { const s = subjectById(tp.subjectId); if (s) s.topics = s.topics.filter(x => x !== id); delete state.topics[id]; state.cards = state.cards.filter(c => c.topicId !== id); if (state.last && state.last.topicId === id) state.last = null; save(); } closeSheet(); render(true); break; }
+    case 'restart': openSession(id, true); break;
+    case 'sheet-view': openSheetView(id); break;
+    case 'copy-sheet': { const tp = state.topics[id]; if (tp) shareSheet(tp, 'copy'); break; }
+    case 'share-sheet': { const tp = state.topics[id]; if (tp) shareSheet(tp, 'share'); break; }
+    case 'learn': { const tp = state.topics[id]; if (!tp) break; if (!getKey()) { openSettings(); toast('Trag zuerst deinen KI-Schlüssel ein.'); break; } openSession(id, !tp.session && tp.status !== 'neu'); break; }
+    case 'sess-close': closeSession(); break;
+    case 'sess-retry': { const tp = sessTopic(); if (tp) { tp.session.err = null; renderSession(); ensureStage(tp, tp.session.stage); } break; }
+    case 'ask': openAsk(); break;
+    case 'mc': answerMC(+t.dataset.q, +t.dataset.o); break;
+    case 'grade': gradeOpen(+t.dataset.q); break;
+    case 'hint': { const tp = sessTopic(); if (tp) { tp.session.hints[tp.session.stage + ':' + t.dataset.q] = true; save(); renderSession(true); } break; }
+    case 'next': nextStage(false); break;
+    case 'skip': nextStage(true); break;
+    case 'redo': redoStage(); break;
+    case 'grade-sum': gradeSummary(); break;
+    case 'sum-again': { const tp = sessTopic(); if (tp) { tp.session.results[4] = null; save(); renderSession(true); const ta = $('#ans-4-0'); if (ta) ta.focus(); } break; }
+    case 'finish-retry': { const tp = sessTopic(); if (tp) runFinish(tp); break; }
+    case 'finish-skip': { const tp = sessTopic(); if (tp) { finishTopic(tp, '', []); save(); renderSession(); } break; }
+    case 'finish-done': { const tp = sessTopic(); if (tp) { tp.session = null; state.last = { topicId: tp.id, ts: Date.now() }; save(); } closeSession(); break; }
+    case 'review': startReview(null); break;
+    case 'review-subject': startReview(id); break;
+    case 'rv-reveal': if (review) { review.revealed = true; renderReview(); } break;
+    case 'rv-known': if (review) rateCard(true); break;
+    case 'rv-again': if (review) rateCard(false); break;
+    case 'review-done': review = null; $('#overlay').hidden = true; $('#overlay').innerHTML = ''; render(true); break;
+    case 'exam': { if (!getKey()) { openSettings(); toast('Trag zuerst deinen KI-Schlüssel ein.'); break; } startExam(id); break; }
+    case 'exam-retry': if (exam) startExam(exam.sid); break;
+    case 'exam-submit': submitExam(); break;
+    case 'exam-close': if (exam && exam.status === 'answer' && exam.tasks.some((_, i) => String(exam.answers[i] || '').trim())) { confirmSheet({ title: 'Probeklausur abbrechen?', text: 'Deine Antworten gehen verloren.', confirm: 'Abbrechen', act: 'exam-close-yes' }); break; } exam = null; $('#overlay').hidden = true; $('#overlay').innerHTML = ''; render(true); break;
+    case 'exam-close-yes': closeSheet(); exam = null; $('#overlay').hidden = true; $('#overlay').innerHTML = ''; render(true); break;
+    case 'sheet-close': closeSheet(); if (matCtx && matCtx.mode !== 'work') matCtx = null; break;
+  }
+});
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (el.dataset && el.dataset.st) { const tp = sessTopic(); if (!tp) return; const st = +el.dataset.st; if (st === 4) tp.session.answers[4] = el.value; else tp.session.answers[st][+el.dataset.q] = el.value; saveSoon(); }
+  else if (el.dataset && el.dataset.ex != null && exam) { exam.answers[+el.dataset.ex] = el.value; }
+});
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.id === 'matPdf' && el.files && el.files[0]) processPdf(el.files[0]);
+  else if (el.id === 'matFoto' && el.files && el.files.length) processFotos(Array.from(el.files).slice(0, 12));
+  else if (el.id === 'importFile' && el.files && el.files[0]) importBackup(el.files[0]);
+});
+document.addEventListener('submit', e => {
+  if (e.target.id === 'askForm') { e.preventDefault(); const i = $('#askInput'); const v = i.value; i.value = ''; sendAsk(v); }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !$('#sheetWrap').hidden) closeSheet();
+  if (e.key === 'Enter' && e.target && e.target.id === 'nameInput') { e.preventDefault(); const b = $('.sheet-nav .nav-btn.strong'); if (b) b.click(); }
+});
+$('#sheetWrap').addEventListener('click', e => { if (e.target.id === 'sheetWrap' && !(matCtx && matCtx.mode === 'work' && !matCtx.error)) closeSheet(); });
+$('#main').addEventListener('scroll', onScroll, { passive: true });
+window.addEventListener('pagehide', save);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(); });
+
+render();
+if (!state.profile.onboarded) setTimeout(openSettings, 300);
+if ('serviceWorker' in navigator && location.protocol === 'https:') window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+})();
+</script>
+</body>
+</html>
